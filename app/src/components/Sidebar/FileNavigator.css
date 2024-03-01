@@ -1,0 +1,23 @@
+.file-navigator {
+  width: 200px;
+  height: 100vh;
+  padding: 0 10px;
+  background-color: #1e1e1e;
+}
+
+.file-navigator ul {
+  padding-left: 15px;
+  list-style: none;
+}
+
+.file-navigator li {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.file-navigator-icon {
+  margin-right: 5px;
+  font-size: 15px;
+}

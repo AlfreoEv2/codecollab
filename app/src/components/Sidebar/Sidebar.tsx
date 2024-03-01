@@ -1,7 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import FileNavigator from "../../components/Sidebar/FileNavigator";
+import { SidebarProps } from "../../interfaces/SidebarInterface";
 import "./Sidebar.css";
 
-const Sidebar = () => {
+const Sidebar = ({ files }: SidebarProps) => {
   return (
     <div className="sidebar-container">
       <div className="sidebar">
@@ -11,6 +13,7 @@ const Sidebar = () => {
           className="sidebar-icon"
         />
       </div>
+      <FileNavigator files={files} />
     </div>
   );
 };
