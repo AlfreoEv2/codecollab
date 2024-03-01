@@ -4,7 +4,6 @@ interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  profilePicture?: string;
   creationDate: Date;
 }
 
