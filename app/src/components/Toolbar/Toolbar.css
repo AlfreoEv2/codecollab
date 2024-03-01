@@ -1,0 +1,25 @@
+.toolbar {
+  display: flex;
+  height: 25px;
+  background-color: #181818;
+  border-bottom: 1px solid #555555;
+}
+
+.toolbar button {
+  padding: 5px 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  color: #fff;
+  background-color: #282828;
+}
+
+.toolbar > div {
+  position: relative;
+  display: inline-block;
+}
