@@ -1,8 +1,5 @@
+import { MenuProps } from "../../interfaces/ToolbarInterface";
 import "./Menu.css";
-
-interface MenuProps {
-  items: { label: string }[];
-}
 
 const Menu = ({ items }: MenuProps) => {
   return (

@@ -18,3 +18,8 @@
   color: #fff;
   background-color: #282828;
 }
+
+.toolbar > div {
+  position: relative;
+  display: inline-block;
+}
