@@ -1,5 +1,8 @@
+import { useState } from "react";
 import Toolbar from "../../components/Toolbar/Toolbar";
+import Sidebar from "../../components/Sidebar/Sidebar";
 import { ToolbarProps } from "../../interfaces/ToolbarInterface";
+import { FileOrFolder } from "../../interfaces/SidebarInterface";
 
 const Editor = () => {
   const menus: ToolbarProps[] = [
@@ -41,9 +44,12 @@ const Editor = () => {
     },
   ];
 
+  const [files, setFiles] = useState<FileOrFolder[]>([]);
+
   return (
     <div>
       <Toolbar menus={menus} />
+      <Sidebar files={files} />
     </div>
   );
 };
