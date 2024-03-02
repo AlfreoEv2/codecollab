@@ -1,8 +1,10 @@
 import { useState } from "react";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import CodeArea from "../../components/CodeArea/CodeArea";
 import { ToolbarProps } from "../../interfaces/ToolbarInterface";
 import { FileOrFolder } from "../../interfaces/SidebarInterface";
+import "./Editor.css";
 
 const Editor = () => {
   const menus: ToolbarProps[] = [
@@ -45,11 +47,15 @@ const Editor = () => {
   ];
 
   const [files, setFiles] = useState<FileOrFolder[]>([]);
+  const [lines, setLines] = useState<string[]>([""]);
 
   return (
     <div>
       <Toolbar menus={menus} />
-      <Sidebar files={files} />
+      <div className="editor-area">
+        <Sidebar files={files} />
+        <CodeArea lines={lines} />
+      </div>
     </div>
   );
 };
