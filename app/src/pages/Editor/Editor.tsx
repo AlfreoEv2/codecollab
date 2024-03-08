@@ -49,12 +49,21 @@ const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
   const [lines, setLines] = useState<string[]>([""]);
 
+  const handleLineChange = (
+    e: React.FormEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    const newLines = [...lines];
+    newLines[index] = e.currentTarget.innerHTML;
+    setLines(newLines);
+  };
+
   return (
     <div>
       <Toolbar menus={menus} />
       <div className="editor-area">
         <Sidebar files={files} />
-        <CodeArea lines={lines} />
+        <CodeArea lines={lines} onChange={handleLineChange} />
       </div>
     </div>
   );
