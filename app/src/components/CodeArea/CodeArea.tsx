@@ -4,9 +4,10 @@ import "./CodeArea.css";
 interface ICodeAreaProps {
   lines: string[];
   onChange: (e: React.FormEvent<HTMLDivElement>, index: number) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void;
 }
 
-const CodeArea = ({ lines, onChange }: ICodeAreaProps) => {
+const CodeArea = ({ lines, onChange, onKeyDown }: ICodeAreaProps) => {
   return (
     <div className="code-area">
       {lines.map((line, index) => (
@@ -16,6 +17,7 @@ const CodeArea = ({ lines, onChange }: ICodeAreaProps) => {
             html={line}
             className="line-content"
             onChange={(e) => onChange(e, index)}
+            onKeyDown={(e) => onKeyDown(e, index)}
           />
         </div>
       ))}
