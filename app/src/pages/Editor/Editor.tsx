@@ -2,6 +2,7 @@ import { useState } from "react";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import CodeArea from "../../components/CodeArea/CodeArea";
+import Console from "../../components/Console/Console";
 import { ToolbarProps } from "../../interfaces/ToolbarInterface";
 import { FileOrFolder } from "../../interfaces/SidebarInterface";
 import "./Editor.css";
@@ -100,13 +101,16 @@ const Editor = () => {
   return (
     <div>
       <Toolbar menus={menus} />
-      <div className="editor-area">
+      <div className="editor-container">
         <Sidebar files={files} />
-        <CodeArea
-          lines={lines}
-          onChange={handleLineChange}
-          onKeyDown={handleLineOnEnter}
-        />
+        <div className="code-console-container">
+          <CodeArea
+            lines={lines}
+            onChange={handleLineChange}
+            onKeyDown={handleLineOnEnter}
+          />
+          <Console />
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,30 @@
+.console-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #1e1e1e;
+  border-top: 1px solid #555;
+}
+
+.console-header {
+  padding: 5px 10px;
+  color: #fff;
+}
+
+.console-input {
+  padding: 5px 10px;
+  width: 100%;
+  height: 20px;
+  line-height: 20px;
+  white-space: nowrap;
+  color: #fff;
+  border-top: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+}
+
+.console-input:focus {
+  border-top: 1px solid #555;
+  border-bottom: 1px solid #555;
+  background-color: #2e2e2e;
+  outline: none;
+}
