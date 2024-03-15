@@ -49,6 +49,7 @@ const Editor = () => {
 
   const [files, setFiles] = useState<FileOrFolder[]>([]);
   const [lines, setLines] = useState<string[]>([""]);
+  const [command, setCommand] = useState<string>("");
 
   const handleLineChange = (
     e: React.FormEvent<HTMLDivElement>,
@@ -109,7 +110,7 @@ const Editor = () => {
             onChange={handleLineChange}
             onKeyDown={handleLineOnEnter}
           />
-          <Console />
+          <Console command={command} setCommand={setCommand} />
         </div>
       </div>
     </div>
