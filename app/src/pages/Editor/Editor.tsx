@@ -3,50 +3,11 @@ import Toolbar from "../../components/Toolbar/Toolbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import CodeArea from "../../components/CodeArea/CodeArea";
 import Console from "../../components/Console/Console";
-import { ToolbarProps } from "../../interfaces/ToolbarInterface";
 import { FileOrFolder } from "../../interfaces/SidebarInterface";
+import menuItems from "../../data/menuItems.json";
 import "./Editor.css";
 
 const Editor = () => {
-  const menus: ToolbarProps[] = [
-    {
-      name: "File",
-      items: [
-        { label: "New File" },
-        { label: "Save" },
-        { label: "Save as" },
-        { label: "Separator" },
-        { label: "Download" },
-        { label: "Share" },
-      ],
-    },
-    {
-      name: "Edit",
-      items: [
-        { label: "Undo" },
-        { label: "Redo" },
-        { label: "Separator" },
-        { label: "Cut" },
-        { label: "Copy" },
-        { label: "Paste" },
-      ],
-    },
-    {
-      name: "View",
-      items: [
-        { label: "Zoom in" },
-        { label: "Zoom out" },
-        { label: "Reset zoom" },
-        { label: "Separator" },
-        { label: "Theme" },
-      ],
-    },
-    {
-      name: "Run",
-      items: [{ label: "Start" }, { label: "Stop" }, { label: "Restart" }],
-    },
-  ];
-
   const [files, setFiles] = useState<FileOrFolder[]>([]);
   const [lines, setLines] = useState<string[]>([""]);
   const [command, setCommand] = useState<string>("");
@@ -101,7 +62,7 @@ const Editor = () => {
 
   return (
     <div>
-      <Toolbar menus={menus} />
+      <Toolbar menus={menuItems} />
       <div className="editor-container">
         <Sidebar files={files} />
         <div className="code-console-container">
