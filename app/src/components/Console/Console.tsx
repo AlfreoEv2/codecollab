@@ -1,13 +1,10 @@
-import React from "react";
 import ContentEditable from "../CodeArea/ContentEditable";
+import useEditorContext from "../../hooks/useEditorContext";
 import "./Console.css";
 
-interface IConsoleProps {
-  command: string;
-  setCommand: React.Dispatch<React.SetStateAction<string>>;
-}
+const Console = () => {
+  const { command, setCommand } = useEditorContext();
 
-const Console = ({ command, setCommand }: IConsoleProps) => {
   return (
     <div className="console-container">
       <div className="console-header">Console</div>

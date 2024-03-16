@@ -20,7 +20,7 @@ export default function useLineHandlers(
     setLines(newLines);
   };
 
-  const handleLineOnEnter = (
+  const handleLineEnter = (
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number
   ) => {
@@ -59,5 +59,5 @@ export default function useLineHandlers(
     }
   };
 
-  return [lines, handleLineChange, handleLineOnEnter];
+  return [lines, handleLineChange, handleLineEnter];
 }
