@@ -1,8 +1,10 @@
 import FileNavigatorItem from "./FileNavigatorItem";
-import { FileNavigatorProps } from "../../interfaces/SidebarInterface";
+import useEditorContext from "../../hooks/useEditorContext";
 import "./FileNavigator.css";
 
-const FileNavigator = ({ files }: FileNavigatorProps) => {
+const FileNavigator = () => {
+  const { files } = useEditorContext();
+
   return (
     <div className="file-navigator">
       <ul>

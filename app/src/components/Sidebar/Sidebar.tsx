@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FileNavigator from "../../components/Sidebar/FileNavigator";
-import { SidebarProps } from "../../interfaces/SidebarInterface";
 import "./Sidebar.css";
 
-const Sidebar = ({ files }: SidebarProps) => {
+const Sidebar = () => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   const handleFileIconClick = () => {
@@ -24,7 +23,7 @@ const Sidebar = ({ files }: SidebarProps) => {
           className="sidebar-icon"
         />
       </div>
-      {activeMenu === "file" && <FileNavigator files={files} />}
+      {activeMenu === "file" && <FileNavigator />}
     </div>
   );
 };
