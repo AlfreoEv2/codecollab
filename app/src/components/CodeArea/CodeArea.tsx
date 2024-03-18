@@ -38,30 +38,34 @@ const CodeArea = () => {
 
   return (
     <div className="code-area">
-      {lines.map((line, index) => (
-        <div
-          key={index}
-          className="line-container"
-          onMouseDown={() => handleMouseDown(index)}
-          onMouseMove={() => handleMouseMove(index)}
-          onMouseUp={handleMouseUp}
-        >
-          <div className="line-number">{index + 1}</div>
-          <ContentEditable
-            html={line}
-            className={`line-content ${
-              selection.start !== null &&
-              selection.end !== null &&
-              index >= Math.min(selection.start, selection.end) &&
-              index <= Math.max(selection.start, selection.end)
-                ? "highlight"
-                : ""
-            }`}
-            onChange={(e) => handleLineChange(e, index)}
-            onKeyDown={(e) => handleLineEnter(e, index)}
-          />
-        </div>
-      ))}
+      {lines.map((line, index) => {
+        // Highlight the selected lines
+        const htmlLine =
+          selection.start !== null &&
+          selection.end !== null &&
+          index >= Math.min(selection.start, selection.end) &&
+          index <= Math.max(selection.start, selection.end)
+            ? `<span class="highlight">${line}</span>`
+            : line;
+
+        return (
+          <div
+            key={index}
+            className="line-container"
+            onMouseDown={() => handleMouseDown(index)}
+            onMouseMove={() => handleMouseMove(index)}
+            onMouseUp={handleMouseUp}
+          >
+            <div className="line-number">{index + 1}</div>
+            <ContentEditable
+              html={htmlLine}
+              className="line-content"
+              onChange={(e) => handleLineChange(e, index)}
+              onKeyDown={(e) => handleLineEnter(e, index)}
+            />
+          </div>
+        );
+      })}
     </div>
   );
 };
