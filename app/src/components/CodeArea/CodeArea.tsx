@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ContentEditable from "./ContentEditable";
 import useEditorContext from "../../hooks/useEditorContext";
 import "./CodeArea.css";
@@ -25,16 +25,34 @@ const CodeArea = () => {
   };
 
   const handleMouseUp = () => {
-    if (selection.start !== null && selection.end !== null) {
-      // The start and end index of the selection
-      const start = Math.min(selection.start, selection.end);
-      const end = Math.max(selection.start, selection.end) + 1;
-
-      // Copy the lines between start and end indices
-      navigator.clipboard.writeText(lines.slice(start, end).join("\n"));
-    }
     setIsMouseDown(false);
   };
+
+  useEffect(() => {
+    const handleCopy = (e: ClipboardEvent) => {
+      if (selection.start !== null && selection.end !== null) {
+        e.preventDefault(); // Prevent the default copy action
+
+        // The start and end index of the selection
+        const start = Math.min(selection.start, selection.end);
+        const end = Math.max(selection.start, selection.end) + 1;
+
+        // Copy the lines between start and end indices
+        if (e.clipboardData) {
+          e.clipboardData.setData(
+            "text/plain",
+            lines.slice(start, end).join("\n")
+          );
+        }
+      }
+    };
+
+    document.addEventListener("copy", handleCopy);
+
+    return () => {
+      document.removeEventListener("copy", handleCopy);
+    };
+  }, [selection, lines]);
 
   return (
     <div className="code-area">
