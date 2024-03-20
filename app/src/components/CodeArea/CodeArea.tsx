@@ -54,6 +54,27 @@ const CodeArea = () => {
     };
   }, [selection, lines]);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const lineContainers = document.querySelectorAll(".line-container");
+      // Check if the click is outside the line containers
+      const isClickOutside = Array.from(lineContainers).every(
+        (container) => !container.contains(e.target as Node)
+      );
+
+      if (isClickOutside) {
+        // Reset the selection
+        setSelection({ start: null, end: null });
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="code-area">
       {lines.map((line, index) => {
