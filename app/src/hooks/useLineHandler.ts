@@ -16,7 +16,25 @@ export default function useLineHandlers(
     index: number
   ) => {
     const newLines = [...lines];
-    newLines[index] = e.currentTarget.innerHTML;
+
+    if (e.currentTarget.innerHTML.includes("<div>")) {
+      console.log(e.currentTarget.innerHTML);
+      // Split the content by divs and remove the div tags
+      const splitContent = e.currentTarget.innerHTML
+        .split("<div>")
+        .map((line) => line.replace("</div>", ""));
+
+      // Remove the first div
+      splitContent.shift();
+
+      // Update the current line with the first line
+      newLines[index] += splitContent.shift();
+
+      newLines.splice(index + 1, 0, ...splitContent);
+    } else {
+      newLines[index] = e.currentTarget.innerHTML;
+    }
+
     setLines(newLines);
   };
 
