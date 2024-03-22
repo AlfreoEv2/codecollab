@@ -68,13 +68,12 @@ export default function useLineHandlers(
   ) => {
     e.preventDefault();
 
-    const pastedData = e.clipboardData.getData("text/html");
     const newLines = [...lines];
+    const htmlText = e.clipboardData.getData("text/html");
 
-    if (pastedData.includes("<div>")) {
-      console.log(pastedData);
+    if (htmlText.includes("<div>")) {
       // Split the content by divs and remove the div tags
-      const splitContent = pastedData
+      const splitContent = htmlText
         .split("<div>")
         .map((line) => line.replace("</div>", ""));
 
@@ -86,7 +85,15 @@ export default function useLineHandlers(
 
       newLines.splice(index + 1, 0, ...splitContent);
     } else {
-      newLines[index] = pastedData;
+      const plainText = e.clipboardData.getData("text/plain");
+
+      // Split the plain text by newlines
+      const splitContent = plainText.split("\n");
+
+      // Update the current line with the first line
+      newLines[index] += splitContent.shift();
+
+      newLines.splice(index + 1, 0, ...splitContent);
     }
 
     setLines(newLines);
