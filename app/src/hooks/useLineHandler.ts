@@ -3,7 +3,8 @@ import { useState } from "react";
 type UseLineHandlers = [
   string[],
   (e: React.FormEvent<HTMLDivElement>, index: number) => void,
-  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void
 ];
 
 export default function useLineHandlers(
@@ -17,23 +18,7 @@ export default function useLineHandlers(
   ) => {
     const newLines = [...lines];
 
-    if (e.currentTarget.innerHTML.includes("<div>")) {
-      console.log(e.currentTarget.innerHTML);
-      // Split the content by divs and remove the div tags
-      const splitContent = e.currentTarget.innerHTML
-        .split("<div>")
-        .map((line) => line.replace("</div>", ""));
-
-      // Remove the first div
-      splitContent.shift();
-
-      // Update the current line with the first line
-      newLines[index] += splitContent.shift();
-
-      newLines.splice(index + 1, 0, ...splitContent);
-    } else {
-      newLines[index] = e.currentTarget.innerHTML;
-    }
+    newLines[index] = e.currentTarget.innerHTML;
 
     setLines(newLines);
   };
@@ -77,5 +62,35 @@ export default function useLineHandlers(
     }
   };
 
-  return [lines, handleLineChange, handleLineEnter];
+  const handlePaste = (
+    e: React.ClipboardEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    e.preventDefault();
+
+    const pastedData = e.clipboardData.getData("text/html");
+    const newLines = [...lines];
+
+    if (pastedData.includes("<div>")) {
+      console.log(pastedData);
+      // Split the content by divs and remove the div tags
+      const splitContent = pastedData
+        .split("<div>")
+        .map((line) => line.replace("</div>", ""));
+
+      // Remove the first div
+      splitContent.shift();
+
+      // Update the current line with the first line
+      newLines[index] += splitContent.shift();
+
+      newLines.splice(index + 1, 0, ...splitContent);
+    } else {
+      newLines[index] = pastedData;
+    }
+
+    setLines(newLines);
+  };
+
+  return [lines, handleLineChange, handleLineEnter, handlePaste];
 }
