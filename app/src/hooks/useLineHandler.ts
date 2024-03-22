@@ -3,7 +3,8 @@ import { useState } from "react";
 type UseLineHandlers = [
   string[],
   (e: React.FormEvent<HTMLDivElement>, index: number) => void,
-  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void
 ];
 
 export default function useLineHandlers(
@@ -16,7 +17,9 @@ export default function useLineHandlers(
     index: number
   ) => {
     const newLines = [...lines];
+
     newLines[index] = e.currentTarget.innerHTML;
+
     setLines(newLines);
   };
 
@@ -59,5 +62,42 @@ export default function useLineHandlers(
     }
   };
 
-  return [lines, handleLineChange, handleLineEnter];
+  const handlePaste = (
+    e: React.ClipboardEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    e.preventDefault();
+
+    const newLines = [...lines];
+    const htmlText = e.clipboardData.getData("text/html");
+
+    if (htmlText.includes("<div>")) {
+      // Split the content by divs and remove the div tags
+      const splitContent = htmlText
+        .split("<div>")
+        .map((line) => line.replace("</div>", ""));
+
+      // Remove the first div
+      splitContent.shift();
+
+      // Update the current line with the first line
+      newLines[index] += splitContent.shift();
+
+      newLines.splice(index + 1, 0, ...splitContent);
+    } else {
+      const plainText = e.clipboardData.getData("text/plain");
+
+      // Split the plain text by newlines
+      const splitContent = plainText.split("\n");
+
+      // Update the current line with the first line
+      newLines[index] += splitContent.shift();
+
+      newLines.splice(index + 1, 0, ...splitContent);
+    }
+
+    setLines(newLines);
+  };
+
+  return [lines, handleLineChange, handleLineEnter, handlePaste];
 }

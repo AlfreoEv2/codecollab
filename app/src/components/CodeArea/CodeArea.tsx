@@ -4,7 +4,8 @@ import useEditorContext from "../../hooks/useEditorContext";
 import "./CodeArea.css";
 
 const CodeArea = () => {
-  const { lines, handleLineChange, handleLineEnter } = useEditorContext();
+  const { lines, handleLineChange, handleLineEnter, handlePaste } =
+    useEditorContext();
 
   // State to keep track of the start and end indices of the selection
   const [selection, setSelection] = useState<{
@@ -101,6 +102,7 @@ const CodeArea = () => {
               className="line-content"
               onChange={(e) => handleLineChange(e, index)}
               onKeyDown={(e) => handleLineEnter(e, index)}
+              onPaste={(e) => handlePaste(e, index)}
             />
           </div>
         );
