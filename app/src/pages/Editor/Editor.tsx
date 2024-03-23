@@ -10,7 +10,22 @@ import EditorContext from "../../contexts/EditorContext";
 import "./Editor.css";
 
 const Editor = () => {
-  const [files, setFiles] = useState<FileOrFolder[]>([]);
+  const [files, setFiles] = useState<FileOrFolder[]>([
+    {
+      name: "index.html",
+      type: "file",
+    },
+    {
+      name: "styles",
+      type: "folder",
+      children: [
+        {
+          name: "styles.css",
+          type: "file",
+        },
+      ],
+    },
+  ]);
   const [command, setCommand] = useState<string>("");
   const [
     lines,
