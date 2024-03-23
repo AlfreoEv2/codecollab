@@ -98,7 +98,8 @@ export default function useLineHandlers(
     index: number
   ) => {
     setLines((prevLines) => {
-      if (e.code === "Backspace" && prevLines[index] === "" && index > 0) {
+      const sel = window.getSelection();
+      if (sel && sel.focusOffset === 0 && index > 0) {
         e.preventDefault();
         const newLines = [...prevLines];
         // Remove the current line
@@ -107,7 +108,6 @@ export default function useLineHandlers(
         setCaretIndex(index - 1);
         return newLines;
       }
-
       return prevLines;
     });
   };
