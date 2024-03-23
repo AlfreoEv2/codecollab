@@ -6,6 +6,7 @@ type UseLineHandlers = [
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.KeyboardEvent<HTMLDivElement>, start: number, end: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void
@@ -112,6 +113,22 @@ export default function useLineHandlers(
     });
   };
 
+  const handleBackspaceHighlight = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    start: number,
+    end: number
+  ) => {
+    e.preventDefault();
+    setLines((prevLines) => {
+      const newLines = [...prevLines];
+      // Remove the highlighted lines
+      newLines.splice(start, end - start);
+      // Set the index of the previous line
+      setCaretIndex(start - 1);
+      return newLines;
+    });
+  };
+
   const handleArrowUp = (
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number
@@ -166,6 +183,7 @@ export default function useLineHandlers(
     handleLineEnter,
     handlePaste,
     handleBackspace,
+    handleBackspaceHighlight,
     handleArrowUp,
     handleArrowDown,
     handleTab,

@@ -10,6 +10,7 @@ const CodeArea = () => {
     handleLineEnter,
     handlePaste,
     handleBackspace,
+    handleBackspaceHighlight,
     handleArrowUp,
     handleArrowDown,
     handleTab,
@@ -115,7 +116,14 @@ const CodeArea = () => {
                     handleLineEnter(e, index);
                     break;
                   case "Backspace":
-                    handleBackspace(e, index);
+                    if (selection.start !== null && selection.end !== null) {
+                      const start = Math.min(selection.start, selection.end);
+                      const end = Math.max(selection.start, selection.end) + 1;
+                      handleBackspaceHighlight(e, start, end);
+                      setSelection({ start: null, end: null });
+                    } else {
+                      handleBackspace(e, index);
+                    }
                     break;
                   case "ArrowUp":
                     handleArrowUp(e, index);
