@@ -1,0 +1,44 @@
+.context-menu {
+  background-color: #000000;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  color: #cccccc;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  padding: 6px 0;
+  min-width: 160px;
+  z-index: 1000; /* Increase z-index if necessary */
+  overflow: hidden; /* To handle sub-menus or overflow */
+  cursor: default; /* Default cursor for the container */
+}
+
+.context-menu div {
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  line-height: 1.5; /* Better line spacing */
+  white-space: nowrap; /* Prevents text wrapping */
+  overflow: hidden; /* Prevents text overflow */
+  text-overflow: ellipsis; /* Adds an ellipsis to overflowed text */
+}
+
+.context-menu div:hover,
+.context-menu div:focus {
+  background-color: #333333;
+  color: #ffffff;
+  outline: none; /* Removes the outline for focused elements */
+}
+
+/* To remove focus outline from divs but keep keyboard accessibility */
+.context-menu div:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Additional styles for separators if needed */
+.context-menu hr {
+  border: 0;
+  height: 1px;
+  background-color: #333333;
+  margin: 5px 0;
+}

@@ -1,7 +1,12 @@
 import "./App.css";
+import Editor from "./pages/Editor/Editor";
 
 function App() {
-  return <></>;
+  return (
+    <>
+      <Editor />
+    </>
+  );
 }
 
 export default App;
