@@ -20,6 +20,7 @@ const Editor = () => {
     handleBackspace,
     handleArrowUp,
     handleArrowDown,
+    handleTab,
   ] = useLineHandlers([""]);
 
   return (
@@ -36,6 +37,7 @@ const Editor = () => {
         handleBackspace,
         handleArrowUp,
         handleArrowDown,
+        handleTab,
       }}
     >
       <div>

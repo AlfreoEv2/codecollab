@@ -7,6 +7,7 @@ type UseLineHandlers = [
   (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void
 ];
 
@@ -115,20 +116,25 @@ export default function useLineHandlers(
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number
   ) => {
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setCaretIndex(index - 1);
-    }
+    e.preventDefault();
+    setCaretIndex(index - 1);
   };
 
   const handleArrowDown = (
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number
   ) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setCaretIndex(index + 1);
-    }
+    e.preventDefault();
+    setCaretIndex(index + 1);
+  };
+
+  const handleTab = (e: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    setLines((prevLines) => {
+      const newLines = [...prevLines];
+      newLines[index] += "&nbsp;&nbsp;";
+      return newLines;
+    });
   };
 
   useEffect(() => {
@@ -162,5 +168,6 @@ export default function useLineHandlers(
     handleBackspace,
     handleArrowUp,
     handleArrowDown,
+    handleTab,
   ];
 }
