@@ -11,6 +11,7 @@ interface IEditorContext {
     index: number
   ) => void;
   handlePaste: (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void;
+  handleTab: (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void;
   handleBackspace: (
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number

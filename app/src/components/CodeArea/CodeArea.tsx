@@ -12,6 +12,7 @@ const CodeArea = () => {
     handleBackspace,
     handleArrowUp,
     handleArrowDown,
+    handleTab,
   } = useEditorContext();
 
   // State to keep track of the start and end indices of the selection
@@ -121,6 +122,9 @@ const CodeArea = () => {
                     break;
                   case "ArrowDown":
                     handleArrowDown(e, index);
+                    break;
+                  case "Tab":
+                    handleTab(e, index);
                     break;
                   default:
                     break;
