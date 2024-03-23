@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 import projectsRouter from "./routes/projects";
 import filesRouter from "./routes/files";
 import foldersRouter from "./routes/folders";
+import commentsRouter from "./routes/comments";
+import changelogsRouter from "./routes/changelogs";
+import editSessionsRouter from "./routes/editSessions";
 
 dotenv.config();
 
@@ -16,6 +19,9 @@ app.use(express.json());
 app.use("/projects", projectsRouter);
 app.use("/files", filesRouter);
 app.use("/folders", foldersRouter);
+app.use("/comments", commentsRouter);
+app.use("/changelogs", changelogsRouter);
+app.use("/editSessions", editSessionsRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send("Welcome to CodeCollab!");
