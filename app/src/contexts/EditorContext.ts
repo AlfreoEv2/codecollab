@@ -16,6 +16,11 @@ interface IEditorContext {
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number
   ) => void;
+  handleBackspaceHighlight: (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    start: number,
+    end: number
+  ) => void;
   handleArrowUp: (
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number
