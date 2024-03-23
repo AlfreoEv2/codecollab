@@ -33,6 +33,10 @@ const Editor = () => {
     handleLineEnter,
     handlePaste,
     handleBackspace,
+    handleBackspaceHighlight,
+    handleArrowUp,
+    handleArrowDown,
+    handleTab,
   ] = useLineHandlers([""]);
 
   return (
@@ -47,6 +51,10 @@ const Editor = () => {
         handleLineEnter,
         handlePaste,
         handleBackspace,
+        handleBackspaceHighlight,
+        handleArrowUp,
+        handleArrowDown,
+        handleTab,
       }}
     >
       <div>

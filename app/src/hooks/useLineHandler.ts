@@ -5,6 +5,10 @@ type UseLineHandlers = [
   (e: React.FormEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
+  (start: number, end: number) => void,
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void
 ];
 
@@ -12,7 +16,7 @@ export default function useLineHandlers(
   initialLines: string[]
 ): UseLineHandlers {
   const [lines, setLines] = useState(initialLines);
-  const [backspaceIndex, setBackspaceIndex] = useState<number | null>(null);
+  const [caretIndex, setCaretIndex] = useState<number | null>(null);
 
   const handleLineChange = (
     e: React.FormEvent<HTMLDivElement>,
@@ -48,18 +52,7 @@ export default function useLineHandlers(
           return newLines;
         });
 
-        setTimeout(() => {
-          // Select the next div
-          const nextLine =
-            document.querySelectorAll(".line-content")[index + 1];
-          if (nextLine) {
-            const range = document.createRange();
-            range.setStart(nextLine, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
-        }, 0);
+        setCaretIndex(index + 1);
       }
     }
   };
@@ -106,28 +99,64 @@ export default function useLineHandlers(
     index: number
   ) => {
     setLines((prevLines) => {
-      if (e.code === "Backspace" && prevLines[index] === "" && index > 0) {
+      const sel = window.getSelection();
+      if (sel && sel.focusOffset === 0 && index > 0) {
         e.preventDefault();
         const newLines = [...prevLines];
         // Remove the current line
         newLines.splice(index, 1);
         // Set the index of the previous line
-        setBackspaceIndex(index - 1);
+        setCaretIndex(index - 1);
         return newLines;
       }
-
       return prevLines;
     });
   };
 
+  const handleBackspaceHighlight = (start: number, end: number) => {
+    setLines((prevLines) => {
+      const newLines = [...prevLines];
+      // Remove the highlighted lines
+      newLines.splice(start, end - start);
+      // Set the index of the previous line
+      setCaretIndex(start - 1);
+      return newLines;
+    });
+  };
+
+  const handleArrowUp = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    e.preventDefault();
+    setCaretIndex(index - 1);
+  };
+
+  const handleArrowDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    e.preventDefault();
+    setCaretIndex(index + 1);
+  };
+
+  const handleTab = (e: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    e.preventDefault();
+    setLines((prevLines) => {
+      const newLines = [...prevLines];
+      newLines[index] += "&nbsp;&nbsp;";
+      return newLines;
+    });
+  };
+
   useEffect(() => {
-    if (backspaceIndex !== null) {
+    if (caretIndex !== null) {
       setTimeout(() => {
         const sel = window.getSelection();
         if (sel) {
           // Select the previous div
           const prevLine =
-            document.querySelectorAll(".line-content")[backspaceIndex];
+            document.querySelectorAll(".line-content")[caretIndex];
           if (prevLine) {
             const range = document.createRange();
             // Set the caret position to the end of the previous line
@@ -138,10 +167,10 @@ export default function useLineHandlers(
           }
         }
         // Reset the backspace index
-        setBackspaceIndex(null);
+        setCaretIndex(null);
       }, 0);
     }
-  }, [backspaceIndex]);
+  }, [caretIndex]);
 
   return [
     lines,
@@ -149,5 +178,9 @@ export default function useLineHandlers(
     handleLineEnter,
     handlePaste,
     handleBackspace,
+    handleBackspaceHighlight,
+    handleArrowUp,
+    handleArrowDown,
+    handleTab,
   ];
 }
