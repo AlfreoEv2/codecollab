@@ -15,6 +15,14 @@ interface IEditorContext {
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number
   ) => void;
+  handleArrowUp: (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => void;
+  handleArrowDown: (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => void;
   command: string;
   setCommand: Dispatch<React.SetStateAction<string>>;
 }
