@@ -57,10 +57,33 @@ const CodeArea = () => {
       }
     };
 
+    const handleCut = (e: ClipboardEvent) => {
+      if (selection.start !== null && selection.end !== null) {
+        e.preventDefault();
+
+        const start = Math.min(selection.start, selection.end);
+        const end = Math.max(selection.start, selection.end) + 1;
+
+        if (e.clipboardData) {
+          e.clipboardData.setData(
+            "text/plain",
+            lines.slice(start, end).join("\n")
+          );
+        }
+
+        // Remove the lines between start and end indices from the editor
+        handleBackspaceHighlight(start, end);
+
+        setSelection({ start: null, end: null });
+      }
+    };
+
     document.addEventListener("copy", handleCopy);
+    document.addEventListener("cut", handleCut);
 
     return () => {
       document.removeEventListener("copy", handleCopy);
+      document.removeEventListener("cut", handleCut);
     };
   }, [selection, lines]);
 
@@ -117,9 +140,10 @@ const CodeArea = () => {
                     break;
                   case "Backspace":
                     if (selection.start !== null && selection.end !== null) {
+                      e.preventDefault();
                       const start = Math.min(selection.start, selection.end);
                       const end = Math.max(selection.start, selection.end) + 1;
-                      handleBackspaceHighlight(e, start, end);
+                      handleBackspaceHighlight(start, end);
                       setSelection({ start: null, end: null });
                     } else {
                       handleBackspace(e, index);
