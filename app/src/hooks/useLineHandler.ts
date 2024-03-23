@@ -5,6 +5,8 @@ type UseLineHandlers = [
   (e: React.FormEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
+  (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void
 ];
 
@@ -12,7 +14,7 @@ export default function useLineHandlers(
   initialLines: string[]
 ): UseLineHandlers {
   const [lines, setLines] = useState(initialLines);
-  const [backspaceIndex, setBackspaceIndex] = useState<number | null>(null);
+  const [caretIndex, setCaretIndex] = useState<number | null>(null);
 
   const handleLineChange = (
     e: React.FormEvent<HTMLDivElement>,
@@ -48,18 +50,7 @@ export default function useLineHandlers(
           return newLines;
         });
 
-        setTimeout(() => {
-          // Select the next div
-          const nextLine =
-            document.querySelectorAll(".line-content")[index + 1];
-          if (nextLine) {
-            const range = document.createRange();
-            range.setStart(nextLine, 0);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-          }
-        }, 0);
+        setCaretIndex(index + 1);
       }
     }
   };
@@ -112,7 +103,7 @@ export default function useLineHandlers(
         // Remove the current line
         newLines.splice(index, 1);
         // Set the index of the previous line
-        setBackspaceIndex(index - 1);
+        setCaretIndex(index - 1);
         return newLines;
       }
 
@@ -120,14 +111,34 @@ export default function useLineHandlers(
     });
   };
 
+  const handleArrowUp = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setCaretIndex(index - 1);
+    }
+  };
+
+  const handleArrowDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setCaretIndex(index + 1);
+    }
+  };
+
   useEffect(() => {
-    if (backspaceIndex !== null) {
+    if (caretIndex !== null) {
       setTimeout(() => {
         const sel = window.getSelection();
         if (sel) {
           // Select the previous div
           const prevLine =
-            document.querySelectorAll(".line-content")[backspaceIndex];
+            document.querySelectorAll(".line-content")[caretIndex];
           if (prevLine) {
             const range = document.createRange();
             // Set the caret position to the end of the previous line
@@ -138,10 +149,10 @@ export default function useLineHandlers(
           }
         }
         // Reset the backspace index
-        setBackspaceIndex(null);
+        setCaretIndex(null);
       }, 0);
     }
-  }, [backspaceIndex]);
+  }, [caretIndex]);
 
   return [
     lines,
@@ -149,5 +160,7 @@ export default function useLineHandlers(
     handleLineEnter,
     handlePaste,
     handleBackspace,
+    handleArrowUp,
+    handleArrowDown,
   ];
 }

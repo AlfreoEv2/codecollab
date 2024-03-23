@@ -10,6 +10,8 @@ const CodeArea = () => {
     handleLineEnter,
     handlePaste,
     handleBackspace,
+    handleArrowUp,
+    handleArrowDown,
   } = useEditorContext();
 
   // State to keep track of the start and end indices of the selection
@@ -107,10 +109,21 @@ const CodeArea = () => {
               className="line-content"
               onChange={(e) => handleLineChange(e, index)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleLineEnter(e, index);
-                } else if (e.key === "Backspace") {
-                  handleBackspace(e, index);
+                switch (e.key) {
+                  case "Enter":
+                    handleLineEnter(e, index);
+                    break;
+                  case "Backspace":
+                    handleBackspace(e, index);
+                    break;
+                  case "ArrowUp":
+                    handleArrowUp(e, index);
+                    break;
+                  case "ArrowDown":
+                    handleArrowDown(e, index);
+                    break;
+                  default:
+                    break;
                 }
               }}
               onPaste={(e) => handlePaste(e, index)}
