@@ -7,6 +7,7 @@ import foldersRouter from "./routes/folders";
 import commentsRouter from "./routes/comments";
 import changelogsRouter from "./routes/changelogs";
 import editSessionsRouter from "./routes/editSessions";
+import usersRouter from "./routes/users";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use("/folders", foldersRouter);
 app.use("/comments", commentsRouter);
 app.use("/changelogs", changelogsRouter);
 app.use("/editSessions", editSessionsRouter);
+app.use("/users", usersRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send("Welcome to CodeCollab!");
