@@ -11,6 +11,10 @@ interface IEditorContext {
     index: number
   ) => void;
   handlePaste: (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void;
+  handleBackspace: (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number
+  ) => void;
   command: string;
   setCommand: Dispatch<React.SetStateAction<string>>;
 }

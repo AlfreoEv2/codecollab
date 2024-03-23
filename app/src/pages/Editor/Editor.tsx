@@ -12,8 +12,13 @@ import "./Editor.css";
 const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
   const [command, setCommand] = useState<string>("");
-  const [lines, handleLineChange, handleLineEnter, handlePaste] =
-    useLineHandlers([""]);
+  const [
+    lines,
+    handleLineChange,
+    handleLineEnter,
+    handlePaste,
+    handleBackspace,
+  ] = useLineHandlers([""]);
 
   return (
     <EditorContext.Provider
@@ -26,6 +31,7 @@ const Editor = () => {
         handleLineChange,
         handleLineEnter,
         handlePaste,
+        handleBackspace,
       }}
     >
       <div>
