@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import projectsRouter from "./routes/projects";
+import filesRouter from "./routes/files";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use("/projects", projectsRouter);
+app.use("/files", filesRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send("Welcome to CodeCollab!");
