@@ -6,6 +6,7 @@ import { createFolder } from "../../apis/folder";
 import CreateFilePopup from "../ContextMenu/CreateFilePopup";
 import useEditorContext from "../../hooks/useEditorContext";
 import { createFile } from "../../apis/file";
+import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
 
 const initialContextMenu = {
   show: false,
@@ -16,6 +17,7 @@ const initialContextMenu = {
 const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [contextMenu, setContextMenu] = useState(initialContextMenu);
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
+  const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
   const { activeProject } = useEditorContext();
 
   const handleContextMenu = (
@@ -43,15 +45,11 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     contextMenuClose();
   };
 
-  const handleCreateFolder = async () => {
-    const folderName = prompt("Enter folder name:");
-    if (folderName) {
+  const handleCreateFolder = async (folderName: string) => {
+    if ("folderName" in item && activeProject !== null) {
       try {
-        await createFolder(
-          folderName,
-          "63e4d7e4c5d8d7c8b0f9d6b3",
-          "65ff6a1e4e99d89e4964b8a0"
-        );
+        await createFolder(folderName, activeProject, item._id);
+        setShowCreateFolderPopup(false);
       } catch (error) {
         console.error("Error creating folder:", error);
       }
@@ -103,12 +101,18 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           onCancel={() => setShowCreateFilePopup(false)}
         />
       )}
+      {showCreateFolderPopup && (
+        <CreateFolderPopup
+          onSubmit={handleCreateFolder}
+          onCancel={() => setShowCreateFolderPopup(false)}
+        />
+      )}
       {contextMenu.show && (
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
           closeContextMenu={contextMenuClose}
-          onCreateFolder={handleCreateFolder}
+          onCreateFolder={() => setShowCreateFolderPopup(true)}
           onCreateFile={() => setShowCreateFilePopup(true)}
         />
       )}
