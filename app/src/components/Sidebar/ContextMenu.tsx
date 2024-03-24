@@ -5,12 +5,14 @@ interface ContextMenuProps {
   x: number;
   y: number;
   closeContextMenu: () => void;
+  onCreateFolder: () => void;
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
   x,
   y,
   closeContextMenu,
+  onCreateFolder,
 }) => {
   return (
     <div
@@ -22,7 +24,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       }}
       onMouseLeave={closeContextMenu}
     >
-      <div>Create Folder</div>
+      <div onClick={onCreateFolder}>Create Folder</div>
       <div>Create File</div>
       <div>Delete</div>
       <div>Rename</div>
