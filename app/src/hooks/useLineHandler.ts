@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useWebSocket from "./useWebSocket";
 
 type UseLineHandlers = [
   string[],
@@ -17,6 +18,11 @@ export default function useLineHandlers(
 ): UseLineHandlers {
   const [lines, setLines] = useState(initialLines);
   const [caretIndex, setCaretIndex] = useState<number | null>(null);
+  const { send } = useWebSocket("ws://localhost:8080", (data) => {
+    if (data.type === "lines") {
+      setLines(data.lines);
+    }
+  });
 
   const handleLineChange = (
     e: React.FormEvent<HTMLDivElement>,
@@ -25,6 +31,9 @@ export default function useLineHandlers(
     setLines((prevLines) => {
       const newLines = [...prevLines];
       newLines[index] = e.currentTarget.innerHTML;
+
+      send({ type: "lines", lines: newLines });
+
       return newLines;
     });
   };
