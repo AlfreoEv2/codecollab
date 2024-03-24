@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { File, Folder, FileOrFolder } from "../../interfaces/SidebarInterface";
+import { FileOrFolder } from "../../interfaces/SidebarInterface";
 import { useState } from "react";
 import ContextMenu from "../ContextMenu/ContextMenu";
-import { createFolder } from "../../apis/folder";
+import { createFolder, deleteFolder } from "../../apis/folder";
 import CreateFilePopup from "../ContextMenu/CreateFilePopup";
 import useEditorContext from "../../hooks/useEditorContext";
-import { createFile } from "../../apis/file";
+import { createFile, deleteFile } from "../../apis/file";
 import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
 
 const initialContextMenu = {
@@ -19,12 +19,15 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
   const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
   const { activeProject } = useEditorContext();
+  const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
 
   const handleContextMenu = (
-    e: React.MouseEvent<HTMLLIElement, MouseEvent>
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    item: FileOrFolder
   ) => {
     e.preventDefault();
     const { pageX, pageY } = e;
+    setSelectedItem(item);
     setContextMenu({ show: true, x: pageX, y: pageY });
   };
 
@@ -57,11 +60,32 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     contextMenuClose();
   };
 
+  const handleDeleteFile = async () => {
+    console.log("We got in handleDeleteFile");
+    console.log("Selected item: " + JSON.stringify(selectedItem));
+
+    if (selectedItem) {
+      try {
+        if ("filename" in selectedItem) {
+          console.log("Trying to delete file: " + selectedItem.filename);
+          await deleteFile(selectedItem._id);
+        } else if ("folderName" in selectedItem) {
+          console.log("Trying to delete folder: " + selectedItem.folderName);
+          await deleteFolder(selectedItem._id);
+        }
+      } catch (error) {
+        console.error("Error deleting file/folder:", error);
+      }
+    }
+
+    contextMenuClose();
+  };
+
   const renderFileOrFolder = (item: FileOrFolder) => {
     if ("filename" in item) {
       // Item is a File
       return (
-        <li>
+        <li onContextMenu={(e) => handleContextMenu(e, item)}>
           <FontAwesomeIcon
             icon={["fas", "file"]}
             className="file-navigator-icon"
@@ -72,7 +96,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     } else {
       // Item is a Folder
       return (
-        <li onContextMenu={(e) => handleContextMenu(e)}>
+        <li onContextMenu={(e) => handleContextMenu(e, item)}>
           <FontAwesomeIcon
             icon={["fas", "folder"]}
             className="file-navigator-icon"
@@ -114,6 +138,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           closeContextMenu={contextMenuClose}
           onCreateFolder={() => setShowCreateFolderPopup(true)}
           onCreateFile={() => setShowCreateFilePopup(true)}
+          onDeleteFile={handleDeleteFile}
         />
       )}
       {renderFileOrFolder(item)}
