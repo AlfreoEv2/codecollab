@@ -1,7 +1,13 @@
-interface FileOrFolder {
-  name: string;
-  type: "file" | "folder";
-  children?: FileOrFolder[];
+export interface File {
+  _id: string;
+  filename: string;
 }
 
-export type { FileOrFolder };
+export interface Folder {
+  _id: string;
+  folderName: string;
+  files: File[];
+  children: Folder[];
+}
+
+export type FileOrFolder = File | Folder;

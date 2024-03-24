@@ -9,7 +9,7 @@ import useLineHandlers from "../../hooks/useLineHandler";
 import EditorContext from "../../contexts/EditorContext";
 import "./Editor.css";
 import NewProjectPopup from "../../components/NewProjectPopup/NewProjectPopup";
-import { createProject } from "../../apis/project";
+import { createProject, getProjectDetails } from "../../apis/project";
 
 const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
@@ -38,6 +38,8 @@ const Editor = () => {
       };
       const newProject = await createProject(projectData);
       setActiveProject(newProject._id);
+      const projectDetails = await getProjectDetails(newProject._id);
+      setFiles([projectDetails.rootFolder]);
       setShowNewProjectPopup(false);
     } catch (error) {
       console.error("Error creating project:", error);

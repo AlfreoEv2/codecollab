@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FileOrFolder } from "../../interfaces/SidebarInterface";
+import { File, Folder, FileOrFolder } from "../../interfaces/SidebarInterface";
 import { useState } from "react";
 import ContextMenu from "./ContextMenu";
 import { createFolder } from "../../apis/folder";
@@ -10,7 +10,7 @@ const initialContextMenu = {
   y: 0,
 };
 
-const FileNavigatorItem = ({ file }: { file: FileOrFolder }) => {
+const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [contextMenu, setContextMenu] = useState(initialContextMenu);
 
   const handleContextMenu = (
@@ -41,6 +41,42 @@ const FileNavigatorItem = ({ file }: { file: FileOrFolder }) => {
     contextMenuClose();
   };
 
+  const renderFileOrFolder = (item: FileOrFolder) => {
+    if ("filename" in item) {
+      // Item is a File
+      return (
+        <li>
+          <FontAwesomeIcon
+            icon={["fas", "file"]}
+            className="file-navigator-icon"
+          />
+          {item.filename}
+        </li>
+      );
+    } else {
+      // Item is a Folder
+      return (
+        <li onContextMenu={(e) => handleContextMenu(e)}>
+          <FontAwesomeIcon
+            icon={["fas", "folder"]}
+            className="file-navigator-icon"
+          />
+          {item.folderName}
+          {item.children && (
+            <ul>
+              {item.children.map((child, index) => (
+                <FileNavigatorItem key={index} item={child} />
+              ))}
+              {item.files.map((file, index) => (
+                <FileNavigatorItem key={index} item={file} />
+              ))}
+            </ul>
+          )}
+        </li>
+      );
+    }
+  };
+
   return (
     <>
       {contextMenu.show && (
@@ -51,20 +87,7 @@ const FileNavigatorItem = ({ file }: { file: FileOrFolder }) => {
           onCreateFolder={handleCreateFolder}
         />
       )}
-      <li onContextMenu={(e) => handleContextMenu(e)}>
-        <FontAwesomeIcon
-          icon={["fas", file.type === "file" ? "file" : "folder"]}
-          className="file-navigator-icon"
-        />
-        {file.name}
-        {file.type === "folder" && file.children && (
-          <ul>
-            {file.children.map((child, index) => (
-              <FileNavigatorItem key={index} file={child} />
-            ))}
-          </ul>
-        )}
-      </li>
+      {renderFileOrFolder(item)}
     </>
   );
 };

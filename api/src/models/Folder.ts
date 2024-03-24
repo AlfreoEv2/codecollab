@@ -6,7 +6,7 @@ interface IFolder extends Document {
   project: ObjectId;
   parentFolder?: ObjectId;
   files: ObjectId[];
-  subFolders: ObjectId[];
+  children: ObjectId[];
   creationDate: Date;
   lastModifiedDate: Date;
 }
@@ -16,7 +16,7 @@ const FolderSchema: Schema = new Schema({
   project: { type: Schema.Types.ObjectId, ref: "Project", required: true },
   parentFolder: { type: Schema.Types.ObjectId, ref: "Folder" },
   files: [{ type: Schema.Types.ObjectId, ref: "File" }],
-  subFolders: [{ type: Schema.Types.ObjectId, ref: "Folder" }],
+  children: [{ type: Schema.Types.ObjectId, ref: "Folder" }],
   creationDate: { type: Date, default: Date.now },
   lastModifiedDate: { type: Date, default: Date.now },
 });

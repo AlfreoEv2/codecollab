@@ -32,6 +32,36 @@ router.get("/owner/:ownerId", async (req, res) => {
   }
 });
 
+// GET a specific project
+router.get("/:id", async (req, res) => {
+  try {
+    const project = await ProjectModel.findById(req.params.id)
+      .populate({
+        path: "rootFolder",
+        populate: {
+          path: "children",
+          populate: {
+            path: "children",
+            model: "Folder",
+            populate: {
+              path: "files",
+              model: "File",
+            },
+          },
+        },
+      })
+      .exec();
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.json(project);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // POST a new project
 router.post("/", async (req, res) => {
   const newProject = new ProjectModel({
@@ -47,7 +77,7 @@ router.post("/", async (req, res) => {
 
     // Create the root folder for the project
     const rootFolder = new FolderModel({
-      folderName: "My Project",
+      folderName: "ROOT-" + newProject.projectName,
       project: newProject._id,
     });
 
