@@ -8,10 +8,14 @@ import menuItems from "../../data/menuItems.json";
 import useLineHandlers from "../../hooks/useLineHandler";
 import EditorContext from "../../contexts/EditorContext";
 import "./Editor.css";
+import NewProjectPopup from "../../components/NewProjectPopup/NewProjectPopup";
+import { createProject } from "../../apis/project";
 
 const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
   const [command, setCommand] = useState<string>("");
+  const [activeProject, setActiveProject] = useState<string | null>(null);
+  const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
   const [
     lines,
     handleLineChange,
@@ -24,6 +28,30 @@ const Editor = () => {
     handleTab,
   ] = useLineHandlers([""]);
 
+  const handleNewProject = async (projectName: string) => {
+    try {
+      const projectData = {
+        projectName,
+        owner: "65ff34d5cc86ce3e8187c738", // Replace with the actual owner ID
+        collaborators: [], // Add collaborators if needed
+        language: "javascript", // Replace with the desired language
+      };
+      const newProject = await createProject(projectData);
+      setActiveProject(newProject._id);
+      setShowNewProjectPopup(false);
+    } catch (error) {
+      console.error("Error creating project:", error);
+    }
+  };
+
+  const handleNewProjectClick = () => {
+    console.log("New Project Clicked!!");
+    setShowNewProjectPopup(true);
+  };
+
+  const handleNewProjectCancel = () => {
+    setShowNewProjectPopup(false);
+  };
   return (
     <EditorContext.Provider
       value={{
@@ -43,7 +71,7 @@ const Editor = () => {
       }}
     >
       <div>
-        <Toolbar menus={menuItems} />
+        <Toolbar menus={menuItems} onNewProjectClick={handleNewProjectClick} />
         <div className="editor-container">
           <Sidebar />
           <div className="code-console-container">
@@ -51,6 +79,12 @@ const Editor = () => {
             <Console />
           </div>
         </div>
+        {showNewProjectPopup && (
+          <NewProjectPopup
+            onSubmit={handleNewProject}
+            onCancel={handleNewProjectCancel}
+          />
+        )}
       </div>
     </EditorContext.Provider>
   );

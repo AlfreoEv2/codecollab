@@ -1,0 +1,56 @@
+.new-project-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.new-project-popup form {
+  background-color: #181818;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.new-project-popup label {
+  display: block;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.new-project-popup input {
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 10px;
+  background-color: #282828;
+  color: #fff;
+  border: none;
+}
+
+.new-project-popup .buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.new-project-popup button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  font-size: 16px;
+  color: #fff;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.new-project-popup button:hover {
+  color: #fff;
+  background-color: #282828;
+}
+
+.new-project-popup .separator {
+  border-bottom: 1px solid #555;
+}

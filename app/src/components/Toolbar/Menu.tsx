@@ -1,13 +1,25 @@
 import { MenuProps } from "../../interfaces/ToolbarInterface";
 import "./Menu.css";
 
-const Menu = ({ items }: MenuProps) => {
+interface MenuPropsWithNewProject extends MenuProps {
+  onNewProjectClick: () => void;
+}
+
+const Menu = ({ items, onNewProjectClick }: MenuPropsWithNewProject) => {
+  const handleNewProjectClick = () => {
+    onNewProjectClick();
+  };
+
   return (
     <div className="menu">
       <div className="separator"></div>
       {items.map((item, index) =>
         item.label === "Separator" ? (
           <div key={index} className="separator"></div>
+        ) : item.label === "New Project" ? (
+          <button key={index} onClick={handleNewProjectClick}>
+            {item.label}
+          </button>
         ) : (
           <button key={index}>{item.label}</button>
         )

@@ -1,21 +1,21 @@
 import axios from "axios";
 
-export const getProjectsByOwner = async (ownerId: string) => {
+interface CreateProjectData {
+  projectName: string;
+  owner: string;
+  collaborators: string[];
+  language: string;
+}
+
+export const createProject = async (projectData: CreateProjectData) => {
   try {
-    const response = await axios.get(
-      `http://localhost:3000/projects/owner/${ownerId}`
+    const response = await axios.post(
+      "http://localhost:3000/projects/",
+      projectData
     );
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 404) {
-        console.error("No projects found for the given owner");
-      } else {
-        console.error("Error retrieving projects by owner:", error);
-      }
-    } else {
-      console.error("Unknown error:", error);
-    }
+    console.error("Error creating project:", error);
     throw error;
   }
 };
