@@ -27,6 +27,7 @@ interface IEditorContext {
   ) => void;
   command: string;
   setCommand: Dispatch<React.SetStateAction<string>>;
+  activeProject: string | null;
 }
 
 const EditorContext = createContext<IEditorContext | undefined>(undefined);

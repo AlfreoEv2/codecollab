@@ -2,7 +2,8 @@
   {
     "name": "File",
     "items": [
-      { "label": "New File" },
+      { "label": "New Project" },
+      { "label": "Open Project" },
       { "label": "Save" },
       { "label": "Save as" },
       { "label": "Separator" },

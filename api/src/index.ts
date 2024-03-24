@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import projectsRouter from "./routes/projects";
 import filesRouter from "./routes/files";
 import foldersRouter from "./routes/folders";
@@ -15,6 +16,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cors());
 
 // Routes
 app.use("/projects", projectsRouter);
