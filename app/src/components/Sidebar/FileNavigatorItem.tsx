@@ -7,6 +7,7 @@ import CreateFilePopup from "../ContextMenu/CreateFilePopup";
 import useEditorContext from "../../hooks/useEditorContext";
 import { createFile, deleteFile, renameFile } from "../../apis/file";
 import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
+import RenamePopup from "../ContextMenu/RenamePopup";
 
 const initialContextMenu = {
   show: false,
@@ -18,6 +19,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [contextMenu, setContextMenu] = useState(initialContextMenu);
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
   const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
+  const [showRenamePopup, setShowRenamePopup] = useState(false);
   const { activeProject } = useEditorContext();
   const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
 
@@ -81,31 +83,17 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     contextMenuClose();
   };
 
-  const handleRenameFileFolder = async () => {
-    if (selectedItem && "filename" in selectedItem) {
-      const newFilename = prompt(
-        "Enter the new filename:",
-        selectedItem.filename
-      );
-      if (newFilename) {
-        try {
-          await renameFile(selectedItem._id, newFilename);
-        } catch (error) {
-          console.error("Error renaming file:", error);
+  const handleRenameFileFolder = async (newName: string) => {
+    if (selectedItem) {
+      try {
+        if ("filename" in selectedItem) {
+          await renameFile(selectedItem._id, newName);
+        } else if ("folderName" in selectedItem) {
+          await renameFolder(selectedItem._id, newName);
         }
-      }
-    }
-    if (selectedItem && "folderName" in selectedItem) {
-      const newFolderName = prompt(
-        "Enter the new folder name:",
-        selectedItem.folderName
-      );
-      if (newFolderName) {
-        try {
-          await renameFolder(selectedItem._id, newFolderName);
-        } catch (error) {
-          console.error("Error renaming folder:", error);
-        }
+        setShowRenamePopup(false);
+      } catch (error) {
+        console.error("Error renaming file/folder:", error);
       }
     }
     contextMenuClose();
@@ -161,6 +149,19 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           onCancel={() => setShowCreateFolderPopup(false)}
         />
       )}
+      {showRenamePopup && (
+        <RenamePopup
+          onSubmit={handleRenameFileFolder}
+          onCancel={() => setShowRenamePopup(false)}
+          initialName={
+            selectedItem && "filename" in selectedItem
+              ? selectedItem.filename
+              : selectedItem && "folderName" in selectedItem
+              ? selectedItem.folderName
+              : ""
+          }
+        />
+      )}
       {contextMenu.show && (
         <ContextMenu
           x={contextMenu.x}
@@ -169,7 +170,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           onCreateFolder={() => setShowCreateFolderPopup(true)}
           onCreateFile={() => setShowCreateFilePopup(true)}
           onDeleteFile={handleDeleteFile}
-          onRenameFileFolder={handleRenameFileFolder}
+          onRenameFileFolder={() => setShowRenamePopup(true)}
         />
       )}
       {renderFileOrFolder(item)}
