@@ -7,6 +7,7 @@ interface ContextMenuProps {
   closeContextMenu: () => void;
   onCreateFolder: () => void;
   onCreateFile: () => void;
+  onDeleteFile: () => void;
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = ({
@@ -15,6 +16,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   closeContextMenu,
   onCreateFolder,
   onCreateFile,
+  onDeleteFile,
 }) => {
   return (
     <div
@@ -28,7 +30,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     >
       <div onClick={onCreateFolder}>Create Folder</div>
       <div onClick={onCreateFile}>Create File</div>
-      <div>Delete</div>
+      <div onClick={onDeleteFile}>Delete</div>
       <div>Rename</div>
     </div>
   );

@@ -13,3 +13,13 @@ export const createFile = async (filename: string, parentFolderId: string) => {
     throw error;
   }
 };
+
+export const deleteFile = async (fileId: string) => {
+  try {
+    console.log("We called the Delete API");
+    await axios.delete(`http://localhost:3000/files/${fileId}`);
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    throw error;
+  }
+};

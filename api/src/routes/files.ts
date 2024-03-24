@@ -55,4 +55,28 @@ router.post("/", async (req, res) => {
   }
 });
 
+// DELETE a file
+router.delete("/:id", async (req, res) => {
+  try {
+    const file = await FileModel.findById(req.params.id);
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    // Remove the file from the parent folder's files array
+    await FolderModel.findByIdAndUpdate(
+      file.parentFolder,
+      { $pull: { files: file._id } },
+      { new: true }
+    );
+
+    // Delete the file
+    await FileModel.deleteOne({ _id: file._id });
+
+    res.json({ message: "File deleted successfully" });
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default router;
