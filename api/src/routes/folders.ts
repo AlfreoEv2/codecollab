@@ -29,14 +29,28 @@ router.get("/:id", async (req, res) => {
 
 // POST a new folder
 router.post("/", async (req, res) => {
-  const newFolder = new FolderModel({
-    folderName: req.body.folderName,
-    project: req.body.project,
-    parentFolder: req.body.parentFolder,
-  });
+  const { folderName, project, parentFolder } = req.body;
 
   try {
+    // Create a new folder
+    const newFolder = new FolderModel({
+      folderName,
+      project,
+      parentFolder,
+    });
+
+    // Save the new folder
     const savedFolder = await newFolder.save();
+
+    // Update the parent folder's children array
+    if (parentFolder) {
+      await FolderModel.findByIdAndUpdate(
+        parentFolder,
+        { $push: { children: savedFolder._id } },
+        { new: true }
+      );
+    }
+
     res.status(201).json(savedFolder);
   } catch (err: any) {
     res.status(400).json({ message: err.message });

@@ -32,35 +32,35 @@ router.get("/owner/:ownerId", async (req, res) => {
   }
 });
 
+// Recursive function to populate nested folders and files
+async function populateFolderRecursive(folder: any) {
+  await FolderModel.populate(folder, {
+    path: "children",
+    model: "Folder",
+  });
+
+  await FolderModel.populate(folder, {
+    path: "files",
+    model: "File",
+  });
+
+  for (const childFolder of folder.children) {
+    await populateFolderRecursive(childFolder);
+  }
+}
+
 // GET a specific project
 router.get("/:id", async (req, res) => {
   try {
-    const project = await ProjectModel.findById(req.params.id)
-      .populate({
-        path: "rootFolder",
-        populate: [
-          {
-            path: "children",
-            populate: {
-              path: "children",
-              model: "Folder",
-              populate: {
-                path: "files",
-                model: "File",
-              },
-            },
-          },
-          {
-            path: "files",
-            model: "File",
-          },
-        ],
-      })
-      .exec();
+    const project = await ProjectModel.findById(req.params.id).populate({
+      path: "rootFolder",
+    });
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
+
+    await populateFolderRecursive(project.rootFolder);
 
     res.json(project);
   } catch (err: any) {
