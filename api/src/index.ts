@@ -9,6 +9,7 @@ import commentsRouter from "./routes/comments";
 import changelogsRouter from "./routes/changelogs";
 import editSessionsRouter from "./routes/editSessions";
 import usersRouter from "./routes/users";
+import WebSocket from "ws";
 
 dotenv.config();
 
@@ -29,6 +30,26 @@ app.use("/users", usersRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send("Welcome to CodeCollab!");
+});
+
+// WebSocket server
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on("connection", (ws) => {
+  console.log("Client connected");
+
+  ws.on("message", (data) => {
+    wss.clients.forEach((client) => {
+      // Send the data to all clients except the sender
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(data.toString());
+      }
+    });
+  });
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
+  });
 });
 
 // Connect to MongoDB
