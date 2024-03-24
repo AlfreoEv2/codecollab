@@ -23,3 +23,18 @@ export const deleteFile = async (fileId: string) => {
     throw error;
   }
 };
+
+export const renameFile = async (fileId: string, newFilename: string) => {
+  try {
+    const response = await axios.patch(
+      `http://localhost:3000/files/${fileId}`,
+      {
+        newFilename,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error renaming file:", error);
+    throw error;
+  }
+};

@@ -26,3 +26,18 @@ export const deleteFolder = async (folderId: string) => {
     throw error;
   }
 };
+
+export const renameFolder = async (folderId: string, newFolderName: string) => {
+  try {
+    const response = await axios.patch(
+      `http://localhost:3000/folders/${folderId}`,
+      {
+        newFolderName,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error renaming folder:", error);
+    throw error;
+  }
+};

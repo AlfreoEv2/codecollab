@@ -2,11 +2,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileOrFolder } from "../../interfaces/SidebarInterface";
 import { useState } from "react";
 import ContextMenu from "../ContextMenu/ContextMenu";
-import { createFolder, deleteFolder } from "../../apis/folder";
+import { createFolder, deleteFolder, renameFolder } from "../../apis/folder";
 import CreateFilePopup from "../ContextMenu/CreateFilePopup";
 import useEditorContext from "../../hooks/useEditorContext";
-import { createFile, deleteFile } from "../../apis/file";
+import { createFile, deleteFile, renameFile } from "../../apis/file";
 import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
+import RenamePopup from "../ContextMenu/RenamePopup";
 
 const initialContextMenu = {
   show: false,
@@ -18,6 +19,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [contextMenu, setContextMenu] = useState(initialContextMenu);
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
   const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
+  const [showRenamePopup, setShowRenamePopup] = useState(false);
   const { activeProject } = useEditorContext();
   const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
 
@@ -81,6 +83,22 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     contextMenuClose();
   };
 
+  const handleRenameFileFolder = async (newName: string) => {
+    if (selectedItem) {
+      try {
+        if ("filename" in selectedItem) {
+          await renameFile(selectedItem._id, newName);
+        } else if ("folderName" in selectedItem) {
+          await renameFolder(selectedItem._id, newName);
+        }
+        setShowRenamePopup(false);
+      } catch (error) {
+        console.error("Error renaming file/folder:", error);
+      }
+    }
+    contextMenuClose();
+  };
+
   const renderFileOrFolder = (item: FileOrFolder) => {
     if ("filename" in item) {
       // Item is a File
@@ -131,6 +149,19 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           onCancel={() => setShowCreateFolderPopup(false)}
         />
       )}
+      {showRenamePopup && (
+        <RenamePopup
+          onSubmit={handleRenameFileFolder}
+          onCancel={() => setShowRenamePopup(false)}
+          initialName={
+            selectedItem && "filename" in selectedItem
+              ? selectedItem.filename
+              : selectedItem && "folderName" in selectedItem
+              ? selectedItem.folderName
+              : ""
+          }
+        />
+      )}
       {contextMenu.show && (
         <ContextMenu
           x={contextMenu.x}
@@ -139,6 +170,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           onCreateFolder={() => setShowCreateFolderPopup(true)}
           onCreateFile={() => setShowCreateFilePopup(true)}
           onDeleteFile={handleDeleteFile}
+          onRenameFileFolder={() => setShowRenamePopup(true)}
         />
       )}
       {renderFileOrFolder(item)}
