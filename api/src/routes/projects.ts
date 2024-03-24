@@ -38,17 +38,23 @@ router.get("/:id", async (req, res) => {
     const project = await ProjectModel.findById(req.params.id)
       .populate({
         path: "rootFolder",
-        populate: {
-          path: "children",
-          populate: {
+        populate: [
+          {
             path: "children",
-            model: "Folder",
             populate: {
-              path: "files",
-              model: "File",
+              path: "children",
+              model: "Folder",
+              populate: {
+                path: "files",
+                model: "File",
+              },
             },
           },
-        },
+          {
+            path: "files",
+            model: "File",
+          },
+        ],
       })
       .exec();
 

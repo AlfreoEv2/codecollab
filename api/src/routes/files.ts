@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import FileModel from "../models/File";
+import FolderModel from "../models/Folder";
 
 const router: Router = express.Router();
 
@@ -28,14 +29,26 @@ router.get("/:id", async (req, res) => {
 
 // POST a new file
 router.post("/", async (req, res) => {
-  const newFile = new FileModel({
-    filename: req.body.filename,
-    content: req.body.content,
-    project: req.body.project,
-  });
+  const { filename, content, parentFolder } = req.body;
 
   try {
+    // Create a new file
+    const newFile = new FileModel({
+      filename,
+      content,
+      parentFolder,
+    });
+
+    // Save the new file
     const savedFile = await newFile.save();
+
+    // Update the parent folder's files array
+    await FolderModel.findByIdAndUpdate(
+      parentFolder,
+      { $push: { files: savedFile._id } },
+      { new: true }
+    );
+
     res.status(201).json(savedFile);
   } catch (err: any) {
     res.status(400).json({ message: err.message });

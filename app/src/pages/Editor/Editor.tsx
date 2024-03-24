@@ -92,6 +92,7 @@ const Editor = () => {
         handleArrowUp,
         handleArrowDown,
         handleTab,
+        activeProject,
       }}
     >
       <div>

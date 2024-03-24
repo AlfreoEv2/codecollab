@@ -1,8 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { File, Folder, FileOrFolder } from "../../interfaces/SidebarInterface";
 import { useState } from "react";
-import ContextMenu from "./ContextMenu";
+import ContextMenu from "../ContextMenu/ContextMenu";
 import { createFolder } from "../../apis/folder";
+import CreateFilePopup from "../ContextMenu/CreateFilePopup";
+import useEditorContext from "../../hooks/useEditorContext";
+import { createFile } from "../../apis/file";
 
 const initialContextMenu = {
   show: false,
@@ -12,6 +15,8 @@ const initialContextMenu = {
 
 const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [contextMenu, setContextMenu] = useState(initialContextMenu);
+  const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
+  const { activeProject } = useEditorContext();
 
   const handleContextMenu = (
     e: React.MouseEvent<HTMLLIElement, MouseEvent>
@@ -23,6 +28,19 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
 
   const contextMenuClose = () => {
     setContextMenu(initialContextMenu);
+  };
+
+  const handleCreateFile = async (filename: string) => {
+    if ("folderName" in item) {
+      try {
+        console.log("id: " + item._id + " id and" + activeProject);
+        await createFile(filename, item._id);
+        setShowCreateFilePopup(false);
+      } catch (error) {
+        console.error("Error creating file:", error);
+      }
+    }
+    contextMenuClose();
   };
 
   const handleCreateFolder = async () => {
@@ -79,12 +97,19 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
 
   return (
     <>
+      {showCreateFilePopup && (
+        <CreateFilePopup
+          onSubmit={handleCreateFile}
+          onCancel={() => setShowCreateFilePopup(false)}
+        />
+      )}
       {contextMenu.show && (
         <ContextMenu
           x={contextMenu.x}
           y={contextMenu.y}
           closeContextMenu={contextMenuClose}
           onCreateFolder={handleCreateFolder}
+          onCreateFile={() => setShowCreateFilePopup(true)}
         />
       )}
       {renderFileOrFolder(item)}

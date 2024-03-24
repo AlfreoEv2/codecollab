@@ -27,7 +27,6 @@ export const getProjectDetails = async (projectId: string) => {
       `http://localhost:3000/projects/${projectId}`
     );
     const project = response.data;
-
     console.log("Project:", JSON.stringify(project, null, 2));
 
     const transformFolder = (folder: Folder): Folder => ({
@@ -41,8 +40,8 @@ export const getProjectDetails = async (projectId: string) => {
     });
 
     const rootFolder = transformFolder(project.rootFolder);
-
     console.log("Root folder:", JSON.stringify(rootFolder, null, 2));
+
     return {
       ...project,
       rootFolder,
