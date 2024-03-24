@@ -8,14 +8,16 @@ import menuItems from "../../data/menuItems.json";
 import useLineHandlers from "../../hooks/useLineHandler";
 import EditorContext from "../../contexts/EditorContext";
 import "./Editor.css";
-import NewProjectPopup from "../../components/NewProjectPopup/NewProjectPopup";
+import NewProjectPopup from "../../components/ProjectPopup/NewProjectPopup";
 import { createProject, getProjectDetails } from "../../apis/project";
+import OpenProjectPopup from "../../components/ProjectPopup/OpenProjectPopup";
 
 const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
   const [command, setCommand] = useState<string>("");
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
+  const [showOpenProjectPopup, setShowOpenProjectPopup] = useState(false);
   const [
     lines,
     handleLineChange,
@@ -54,6 +56,26 @@ const Editor = () => {
   const handleNewProjectCancel = () => {
     setShowNewProjectPopup(false);
   };
+
+  const handleOpenProject = async (projectId: string) => {
+    try {
+      const projectDetails = await getProjectDetails(projectId);
+      setActiveProject(projectDetails._id);
+      setFiles([projectDetails.rootFolder]);
+      setShowOpenProjectPopup(false);
+    } catch (error) {
+      console.error("Error opening project:", error);
+    }
+  };
+
+  const handleOpenProjectClick = () => {
+    console.log("Open Project Clicked!!");
+    setShowOpenProjectPopup(true);
+  };
+
+  const handleOpenProjectCancel = () => {
+    setShowOpenProjectPopup(false);
+  };
   return (
     <EditorContext.Provider
       value={{
@@ -73,7 +95,11 @@ const Editor = () => {
       }}
     >
       <div>
-        <Toolbar menus={menuItems} onNewProjectClick={handleNewProjectClick} />
+        <Toolbar
+          menus={menuItems}
+          onNewProjectClick={handleNewProjectClick}
+          onOpenProjectClick={handleOpenProjectClick}
+        />
         <div className="editor-container">
           <Sidebar />
           <div className="code-console-container">
@@ -85,6 +111,12 @@ const Editor = () => {
           <NewProjectPopup
             onSubmit={handleNewProject}
             onCancel={handleNewProjectCancel}
+          />
+        )}
+        {showOpenProjectPopup && (
+          <OpenProjectPopup
+            onSubmit={handleOpenProject}
+            onCancel={handleOpenProjectCancel}
           />
         )}
       </div>

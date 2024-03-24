@@ -3,11 +3,20 @@ import "./Menu.css";
 
 interface MenuPropsWithNewProject extends MenuProps {
   onNewProjectClick: () => void;
+  onOpenProjectClick: () => void;
 }
 
-const Menu = ({ items, onNewProjectClick }: MenuPropsWithNewProject) => {
+const Menu = ({
+  items,
+  onNewProjectClick,
+  onOpenProjectClick,
+}: MenuPropsWithNewProject) => {
   const handleNewProjectClick = () => {
     onNewProjectClick();
+  };
+
+  const handleOpenProjectClick = () => {
+    onOpenProjectClick();
   };
 
   return (
@@ -18,6 +27,10 @@ const Menu = ({ items, onNewProjectClick }: MenuPropsWithNewProject) => {
           <div key={index} className="separator"></div>
         ) : item.label === "New Project" ? (
           <button key={index} onClick={handleNewProjectClick}>
+            {item.label}
+          </button>
+        ) : item.label === "Open Project" ? (
+          <button key={index} onClick={handleOpenProjectClick}>
             {item.label}
           </button>
         ) : (
