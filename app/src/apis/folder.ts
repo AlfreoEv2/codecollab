@@ -17,3 +17,12 @@ export const createFolder = async (
     throw error;
   }
 };
+
+export const deleteFolder = async (folderId: string) => {
+  try {
+    await axios.delete(`http://localhost:3000/folders/${folderId}`);
+  } catch (error) {
+    console.error("Error deleting folder:", error);
+    throw error;
+  }
+};

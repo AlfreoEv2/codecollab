@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileOrFolder } from "../../interfaces/SidebarInterface";
 import { useState } from "react";
 import ContextMenu from "../ContextMenu/ContextMenu";
-import { createFolder } from "../../apis/folder";
+import { createFolder, deleteFolder } from "../../apis/folder";
 import CreateFilePopup from "../ContextMenu/CreateFilePopup";
 import useEditorContext from "../../hooks/useEditorContext";
 import { createFile, deleteFile } from "../../apis/file";
@@ -63,14 +63,21 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const handleDeleteFile = async () => {
     console.log("We got in handleDeleteFile");
     console.log("Selected item: " + JSON.stringify(selectedItem));
-    if (selectedItem && "filename" in selectedItem) {
+
+    if (selectedItem) {
       try {
-        console.log("Trying to delete file: " + selectedItem.filename);
-        await deleteFile(selectedItem._id);
+        if ("filename" in selectedItem) {
+          console.log("Trying to delete file: " + selectedItem.filename);
+          await deleteFile(selectedItem._id);
+        } else if ("folderName" in selectedItem) {
+          console.log("Trying to delete folder: " + selectedItem.folderName);
+          await deleteFolder(selectedItem._id);
+        }
       } catch (error) {
-        console.error("Error deleting file:", error);
+        console.error("Error deleting file/folder:", error);
       }
     }
+
     contextMenuClose();
   };
 
