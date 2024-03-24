@@ -2,10 +2,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileOrFolder } from "../../interfaces/SidebarInterface";
 import { useState } from "react";
 import ContextMenu from "../ContextMenu/ContextMenu";
-import { createFolder, deleteFolder } from "../../apis/folder";
+import { createFolder, deleteFolder, renameFolder } from "../../apis/folder";
 import CreateFilePopup from "../ContextMenu/CreateFilePopup";
 import useEditorContext from "../../hooks/useEditorContext";
-import { createFile, deleteFile } from "../../apis/file";
+import { createFile, deleteFile, renameFile } from "../../apis/file";
 import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
 
 const initialContextMenu = {
@@ -81,6 +81,36 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     contextMenuClose();
   };
 
+  const handleRenameFileFolder = async () => {
+    if (selectedItem && "filename" in selectedItem) {
+      const newFilename = prompt(
+        "Enter the new filename:",
+        selectedItem.filename
+      );
+      if (newFilename) {
+        try {
+          await renameFile(selectedItem._id, newFilename);
+        } catch (error) {
+          console.error("Error renaming file:", error);
+        }
+      }
+    }
+    if (selectedItem && "folderName" in selectedItem) {
+      const newFolderName = prompt(
+        "Enter the new folder name:",
+        selectedItem.folderName
+      );
+      if (newFolderName) {
+        try {
+          await renameFolder(selectedItem._id, newFolderName);
+        } catch (error) {
+          console.error("Error renaming folder:", error);
+        }
+      }
+    }
+    contextMenuClose();
+  };
+
   const renderFileOrFolder = (item: FileOrFolder) => {
     if ("filename" in item) {
       // Item is a File
@@ -139,6 +169,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           onCreateFolder={() => setShowCreateFolderPopup(true)}
           onCreateFile={() => setShowCreateFilePopup(true)}
           onDeleteFile={handleDeleteFile}
+          onRenameFileFolder={handleRenameFileFolder}
         />
       )}
       {renderFileOrFolder(item)}

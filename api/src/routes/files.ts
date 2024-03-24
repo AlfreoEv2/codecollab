@@ -79,4 +79,29 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// PATCH route to rename a file
+router.patch("/:id", async (req, res) => {
+  try {
+    const fileId = req.params.id;
+    const { newFilename } = req.body;
+
+    const updatedFile = await FileModel.findByIdAndUpdate(
+      fileId,
+      {
+        filename: newFilename,
+        lastModifiedDate: new Date(),
+      },
+      { new: true }
+    );
+
+    if (!updatedFile) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    res.json(updatedFile);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default router;
