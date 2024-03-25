@@ -33,22 +33,68 @@ app.get("/", (req, res) => {
 });
 
 // WebSocket server
-const wss = new WebSocket.Server({ port: 8080 });
+const wss: WebSocket.Server = new WebSocket.Server({ port: 8080 });
+const sessions: Map<string, Set<WebSocket>> = new Map();
 
 wss.on("connection", (ws) => {
+  ws.on("error", (error) => {
+    console.error("WebSocket error:", error);
+  });
   console.log("Client connected");
 
   ws.on("message", (data) => {
-    wss.clients.forEach((client) => {
-      // Send the data to all clients except the sender
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(data.toString());
-      }
-    });
+    const message: {
+      type: string;
+      session: string;
+      lines?: string[];
+      files?: string[];
+    } = JSON.parse(data.toString());
+    const session: Set<WebSocket> | undefined = sessions.get(message.session);
+
+    switch (message.type) {
+      case "join":
+        console.log("Client joined session:", message.session);
+        if (!session) {
+          // Create a new session
+          sessions.set(message.session, new Set([ws]));
+        } else {
+          // Add client to session
+          session.add(ws);
+        }
+        break;
+      case "leave":
+        // Remove the client from the session
+        session?.delete(ws);
+        break;
+      case "lines":
+      case "files":
+        // Broadcast the data to all clients in the session except the sender
+        session?.forEach((client: WebSocket) => {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: message.type,
+                [message.type]: (message as any)[message.type],
+              })
+            );
+          }
+        });
+        break;
+      default:
+        console.error("Invalid message type:", message.type);
+    }
   });
 
   ws.on("close", () => {
     console.log("Client disconnected");
+    // Remove the client from all sessions
+    sessions.forEach((clients, session) => {
+      clients.delete(ws);
+      // Delete the session
+      if (clients.size === 0) {
+        sessions.delete(session);
+      }
+    });
   });
 });
 
