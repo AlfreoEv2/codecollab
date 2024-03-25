@@ -8,6 +8,7 @@ import useEditorContext from "../../hooks/useEditorContext";
 import { createFile, deleteFile, renameFile } from "../../apis/file";
 import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
 import RenamePopup from "../ContextMenu/RenamePopup";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const initialContextMenu = {
   show: false,
@@ -20,8 +21,13 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
   const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
   const [showRenamePopup, setShowRenamePopup] = useState(false);
-  const { activeProject } = useEditorContext();
+  const { activeProject, files, setFiles } = useEditorContext();
   const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
+  const { send } = useWebSocket("ws://localhost:8080", (data) => {
+    if (data.type === "files" && data.files) {
+      setFiles(data.files);
+    }
+  });
 
   const handleContextMenu = (
     e: React.MouseEvent<HTMLLIElement, MouseEvent>,
@@ -41,8 +47,38 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     if ("folderName" in item) {
       try {
         console.log("id: " + item._id + " id and" + activeProject);
-        await createFile(filename, item._id);
+        const createFiled = await createFile(filename, item._id);
         setShowCreateFilePopup(false);
+        setFiles((prevFiles) => {
+          const newFiles = JSON.parse(JSON.stringify(prevFiles));
+
+          function findFolderById(array: any, itemId: any): any {
+            for (let i = 0; i < array.length; i++) {
+              const item = array[i];
+              if (item._id === itemId) {
+                console.log("Found it!");
+                console.log(item);
+                item.files.push({
+                  _id: createFiled._id,
+                  filename: filename,
+                });
+                return item;
+              }
+              if (item.children && item.children.length > 0) {
+                const foundItem: any = findFolderById(item.children, itemId);
+                if (foundItem) {
+                  return foundItem;
+                }
+              }
+            }
+            return null;
+          }
+
+          findFolderById(newFiles, item._id);
+
+          send({ type: "files", files: newFiles });
+          return newFiles;
+        });
       } catch (error) {
         console.error("Error creating file:", error);
       }
