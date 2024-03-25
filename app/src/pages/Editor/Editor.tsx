@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import Toolbar from "../../components/Toolbar/Toolbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import CodeArea from "../../components/CodeArea/CodeArea";
@@ -18,6 +20,9 @@ const Editor = () => {
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
   const [showOpenProjectPopup, setShowOpenProjectPopup] = useState(false);
+  const navigate = useNavigate();
+  const { uuid: urlUuid } = useParams();
+
   const [
     lines,
     handleLineChange,
@@ -76,6 +81,16 @@ const Editor = () => {
   const handleOpenProjectCancel = () => {
     setShowOpenProjectPopup(false);
   };
+
+  useEffect(() => {
+    let uuid = urlUuid;
+
+    if (!uuid) {
+      uuid = uuidv4();
+      navigate(`/${uuid}`);
+    }
+  }, []);
+
   return (
     <EditorContext.Provider
       value={{
