@@ -1,6 +1,11 @@
 import { useEffect, useRef } from "react";
+import { FileOrFolder } from "../interfaces/SidebarInterface";
 
-type WebSocketMessage = { type: string; lines: string[] };
+type WebSocketMessage = {
+  type: string;
+  lines?: string[];
+  files?: FileOrFolder[];
+};
 
 export default function useWebSocket(
   url: string,

@@ -8,6 +8,7 @@ import useEditorContext from "../../hooks/useEditorContext";
 import { createFile, deleteFile, renameFile } from "../../apis/file";
 import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
 import RenamePopup from "../ContextMenu/RenamePopup";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const initialContextMenu = {
   show: false,
@@ -22,6 +23,11 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [showRenamePopup, setShowRenamePopup] = useState(false);
   const { activeProject, files, setFiles } = useEditorContext();
   const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
+  const { send } = useWebSocket("ws://localhost:8080", (data) => {
+    if (data.type === "files" && data.files) {
+      setFiles(data.files);
+    }
+  });
 
   const handleContextMenu = (
     e: React.MouseEvent<HTMLLIElement, MouseEvent>,
@@ -69,6 +75,8 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           }
 
           findFolderById(newFiles, item._id);
+
+          send({ type: "files", files: newFiles });
           return newFiles;
         });
       } catch (error) {
