@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { FileOrFolder } from "../interfaces/SidebarInterface";
 
 type WebSocketMessage = {
@@ -11,6 +12,8 @@ export default function useWebSocket(
   url: string,
   onMessage: (data: WebSocketMessage) => void
 ) {
+  // Get the session ID from the URL
+  const { uuid: session } = useParams();
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -18,6 +21,8 @@ export default function useWebSocket(
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket server");
+      // Join the session
+      ws.current?.send(JSON.stringify({ type: "join", session }));
     };
 
     ws.current.onclose = () => {
@@ -41,7 +46,7 @@ export default function useWebSocket(
 
   const send = (data: WebSocketMessage) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify(data));
+      ws.current.send(JSON.stringify({ ...data, session }));
     }
   };
 
