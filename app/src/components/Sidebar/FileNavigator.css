@@ -21,3 +21,10 @@
   margin-right: 5px;
   font-size: 15px;
 }
+
+.file-navigator p {
+  color: #fff;
+  margin: 0;
+  padding: 10px;
+  text-align: center;
+}
