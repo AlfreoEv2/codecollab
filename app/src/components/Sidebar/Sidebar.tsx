@@ -23,7 +23,9 @@ const Sidebar = () => {
           icon={["fas", "code-branch"]}
           className="sidebar-icon"
         />
-        <UserButton />
+        <div className="center-bottom">
+          <UserButton />
+        </div>
       </div>
       {activeMenu === "file" && <FileNavigator />}
     </div>
