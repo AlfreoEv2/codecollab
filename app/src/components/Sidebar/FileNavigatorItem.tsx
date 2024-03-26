@@ -203,6 +203,8 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
                 const item = array[i];
 
                 if (item._id === itemId) {
+                  item.files = [];
+                  item.children = [];
                   array.splice(i, 1);
                   return true;
                 }
