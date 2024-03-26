@@ -156,9 +156,71 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
         if ("filename" in selectedItem) {
           console.log("Trying to delete file: " + selectedItem.filename);
           await deleteFile(selectedItem._id);
+
+          setFiles((prevFiles) => {
+            const newFiles = JSON.parse(JSON.stringify(prevFiles));
+
+            function removeFileById(array: Folder[], itemId: string): boolean {
+              for (let i = 0; i < array.length; i++) {
+                const item = array[i];
+
+                if ("files" in item) {
+                  const fileIndex = item.files.findIndex(
+                    (file) => file._id === itemId
+                  );
+                  if (fileIndex !== -1) {
+                    item.files.splice(fileIndex, 1);
+                    return true;
+                  }
+                }
+
+                if (item.children && item.children.length > 0) {
+                  const removed = removeFileById(item.children, itemId);
+                  if (removed) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            }
+
+            removeFileById(newFiles, selectedItem._id);
+            send({ type: "files", files: newFiles });
+            return newFiles;
+          });
         } else if ("folderName" in selectedItem) {
           console.log("Trying to delete folder: " + selectedItem.folderName);
           await deleteFolder(selectedItem._id);
+
+          setFiles((prevFiles) => {
+            const newFiles = JSON.parse(JSON.stringify(prevFiles));
+
+            function removeFolderById(
+              array: Folder[],
+              itemId: string
+            ): boolean {
+              for (let i = 0; i < array.length; i++) {
+                const item = array[i];
+
+                if (item._id === itemId) {
+                  array.splice(i, 1);
+                  return true;
+                }
+
+                if (item.children && item.children.length > 0) {
+                  const removed = removeFolderById(item.children, itemId);
+                  if (removed) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            }
+
+            removeFolderById(newFiles, selectedItem._id);
+            send({ type: "files", files: newFiles });
+            return newFiles;
+          });
         }
       } catch (error) {
         console.error("Error deleting file/folder:", error);
