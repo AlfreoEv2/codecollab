@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { FileOrFolder } from "../../interfaces/SidebarInterface";
+import { FileOrFolder, Folder } from "../../interfaces/SidebarInterface";
 import { useState } from "react";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import { createFolder, deleteFolder, renameFolder } from "../../apis/folder";
@@ -52,7 +52,10 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
         setFiles((prevFiles) => {
           const newFiles = JSON.parse(JSON.stringify(prevFiles));
 
-          function findFolderById(array: any, itemId: any): any {
+          function findFolderById(
+            array: Folder[],
+            itemId: string
+          ): Folder | null {
             for (let i = 0; i < array.length; i++) {
               const item = array[i];
               if (item._id === itemId) {
@@ -61,11 +64,15 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
                 item.files.push({
                   _id: createFiled._id,
                   filename: filename,
+                  content: createFiled.content,
                 });
                 return item;
               }
               if (item.children && item.children.length > 0) {
-                const foundItem: any = findFolderById(item.children, itemId);
+                const foundItem: Folder | null = findFolderById(
+                  item.children,
+                  itemId
+                );
                 if (foundItem) {
                   return foundItem;
                 }
@@ -89,8 +96,50 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const handleCreateFolder = async (folderName: string) => {
     if ("folderName" in item && activeProject !== null) {
       try {
-        await createFolder(folderName, activeProject, item._id);
+        const createFiled = await createFolder(
+          folderName,
+          activeProject,
+          item._id
+        );
         setShowCreateFolderPopup(false);
+        setFiles((prevFiles) => {
+          const newFiles = JSON.parse(JSON.stringify(prevFiles));
+
+          function findFolderById(
+            array: Folder[],
+            itemId: string
+          ): Folder | null {
+            for (let i = 0; i < array.length; i++) {
+              const item = array[i];
+              if (item._id === itemId) {
+                console.log("Found it!");
+                console.log(item);
+                item.children.push({
+                  _id: createFiled._id,
+                  folderName: folderName,
+                  files: createFiled.files,
+                  children: createFiled.children,
+                });
+                return item;
+              }
+              if (item.children && item.children.length > 0) {
+                const foundItem: Folder | null = findFolderById(
+                  item.children,
+                  itemId
+                );
+                if (foundItem) {
+                  return foundItem;
+                }
+              }
+            }
+            return null;
+          }
+
+          findFolderById(newFiles, item._id);
+
+          send({ type: "files", files: newFiles });
+          return newFiles;
+        });
       } catch (error) {
         console.error("Error creating folder:", error);
       }

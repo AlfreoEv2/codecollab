@@ -14,7 +14,11 @@ const FileNavigator = () => {
 
   return (
     <div className="file-navigator">
-      <ul>{renderFileOrFolderItems(files)}</ul>
+      {files.length > 0 ? (
+        <ul>{renderFileOrFolderItems(files)}</ul>
+      ) : (
+        <p>No files or folders available.</p>
+      )}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 export interface File {
   _id: string;
   filename: string;
+  content: string[];
 }
 
 export interface Folder {

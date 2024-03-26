@@ -13,6 +13,7 @@ import "./Editor.css";
 import NewProjectPopup from "../../components/ProjectPopup/NewProjectPopup";
 import { createProject, getProjectDetails } from "../../apis/project";
 import OpenProjectPopup from "../../components/ProjectPopup/OpenProjectPopup";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
@@ -20,6 +21,11 @@ const Editor = () => {
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
   const [showOpenProjectPopup, setShowOpenProjectPopup] = useState(false);
+  const { send } = useWebSocket("ws://localhost:8080", (data) => {
+    if (data.type === "files" && data.files) {
+      setFiles(data.files);
+    }
+  });
   const navigate = useNavigate();
   const { uuid: urlUuid } = useParams();
 
@@ -48,6 +54,7 @@ const Editor = () => {
       const projectDetails = await getProjectDetails(newProject._id);
       setFiles([projectDetails.rootFolder]);
       setShowNewProjectPopup(false);
+      send({ type: "files", files: [projectDetails.rootFolder] });
     } catch (error) {
       console.error("Error creating project:", error);
     }
@@ -68,6 +75,7 @@ const Editor = () => {
       setActiveProject(projectDetails._id);
       setFiles([projectDetails.rootFolder]);
       setShowOpenProjectPopup(false);
+      send({ type: "files", files: [projectDetails.rootFolder] });
     } catch (error) {
       console.error("Error opening project:", error);
     }
