@@ -173,8 +173,67 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
       try {
         if ("filename" in selectedItem) {
           await renameFile(selectedItem._id, newName);
+          setFiles((prevFiles) => {
+            const newFiles = JSON.parse(JSON.stringify(prevFiles));
+
+            function findFileById(
+              array: Folder[],
+              itemId: string
+            ): FileOrFolder | null {
+              for (let i = 0; i < array.length; i++) {
+                const item = array[i];
+                if ("files" in item) {
+                  const foundFile = item.files.find(
+                    (file) => file._id === itemId
+                  );
+                  if (foundFile) {
+                    foundFile.filename = newName;
+                    return foundFile;
+                  }
+                }
+                if (item.children && item.children.length > 0) {
+                  const foundFile = findFileById(item.children, itemId);
+                  if (foundFile) {
+                    return foundFile;
+                  }
+                }
+              }
+              return null;
+            }
+
+            findFileById(newFiles, selectedItem._id);
+            send({ type: "files", files: newFiles });
+            return newFiles;
+          });
         } else if ("folderName" in selectedItem) {
           await renameFolder(selectedItem._id, newName);
+          setFiles((prevFiles) => {
+            const newFiles = JSON.parse(JSON.stringify(prevFiles));
+
+            function findFolderById(
+              array: Folder[],
+              itemId: string
+            ): Folder | null {
+              for (let i = 0; i < array.length; i++) {
+                const item = array[i];
+                if (item._id === itemId) {
+                  item.folderName = newName;
+                  return item;
+                }
+                if (item.children && item.children.length > 0) {
+                  const foundFolder = findFolderById(item.children, itemId);
+                  if (foundFolder) {
+                    return foundFolder;
+                  }
+                }
+              }
+              return null;
+            }
+
+            findFolderById(newFiles, selectedItem._id);
+            send({ type: "files", files: newFiles });
+            return newFiles;
+          });
         }
         setShowRenamePopup(false);
       } catch (error) {
