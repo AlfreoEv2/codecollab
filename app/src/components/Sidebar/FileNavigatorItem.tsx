@@ -64,6 +64,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
                 item.files.push({
                   _id: createFiled._id,
                   filename: filename,
+                  content: createFiled.content,
                 });
                 return item;
               }

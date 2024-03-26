@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 
 interface IFile extends Document {
   filename: string;
-  content: string;
+  content: string[];
   parentFolder: ObjectId;
   creationDate: Date;
   lastModifiedDate: Date;
@@ -11,7 +11,7 @@ interface IFile extends Document {
 
 const FileSchema: Schema = new Schema({
   filename: { type: String, required: true },
-  content: { type: String, required: true },
+  content: { type: [String] },
   parentFolder: { type: Schema.Types.ObjectId, ref: "Folder", required: true },
   creationDate: { type: Date, default: Date.now },
   lastModifiedDate: { type: Date, default: Date.now },

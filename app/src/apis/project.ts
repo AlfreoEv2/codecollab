@@ -35,6 +35,7 @@ export const getProjectDetails = async (projectId: string) => {
       files: folder.files.map((file: File) => ({
         _id: file._id,
         filename: file.filename,
+        content: file.content,
       })),
       children: folder.children.map(transformFolder),
     });

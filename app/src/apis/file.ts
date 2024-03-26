@@ -4,7 +4,7 @@ export const createFile = async (filename: string, parentFolderId: string) => {
   try {
     const response = await axios.post("http://localhost:3000/files/", {
       filename,
-      content: "-",
+      content: [],
       parentFolder: parentFolderId,
     });
     return response.data;
