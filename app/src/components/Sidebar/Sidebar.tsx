@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FileNavigator from "../../components/Sidebar/FileNavigator";
+import { UserButton } from "@clerk/clerk-react";
 import "./Sidebar.css";
 
 const Sidebar = () => {
@@ -22,6 +23,7 @@ const Sidebar = () => {
           icon={["fas", "code-branch"]}
           className="sidebar-icon"
         />
+        <UserButton />
       </div>
       {activeMenu === "file" && <FileNavigator />}
     </div>
