@@ -5,6 +5,7 @@ interface IEditorContext {
   files: FileOrFolder[];
   setFiles: Dispatch<React.SetStateAction<FileOrFolder[]>>;
   lines: string[];
+  setLines: Dispatch<React.SetStateAction<string[]>>;
   handleLineChange: (e: React.FormEvent<HTMLDivElement>, index: number) => void;
   handleLineEnter: (
     e: React.KeyboardEvent<HTMLDivElement>,

@@ -31,6 +31,7 @@ const Editor = () => {
 
   const [
     lines,
+    setLines,
     handleLineChange,
     handleLineEnter,
     handlePaste,
@@ -107,6 +108,7 @@ const Editor = () => {
         command,
         setCommand,
         lines,
+        setLines,
         handleLineChange,
         handleLineEnter,
         handlePaste,
