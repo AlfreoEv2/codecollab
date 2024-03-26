@@ -3,6 +3,7 @@ import useWebSocket from "./useWebSocket";
 
 type UseLineHandlers = [
   string[],
+  React.Dispatch<React.SetStateAction<string[]>>,
   (e: React.FormEvent<HTMLDivElement>, index: number) => void,
   (e: React.KeyboardEvent<HTMLDivElement>, index: number) => void,
   (e: React.ClipboardEvent<HTMLDivElement>, index: number) => void,
@@ -183,6 +184,7 @@ export default function useLineHandlers(
 
   return [
     lines,
+    setLines,
     handleLineChange,
     handleLineEnter,
     handlePaste,

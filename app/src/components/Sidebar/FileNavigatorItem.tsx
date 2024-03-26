@@ -21,7 +21,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
   const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
   const [showRenamePopup, setShowRenamePopup] = useState(false);
-  const { activeProject, files, setFiles } = useEditorContext();
+  const { activeProject, setFiles, setLines } = useEditorContext();
   const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
   const { send } = useWebSocket("ws://localhost:8080", (data) => {
     if (data.type === "files" && data.files) {
@@ -307,11 +307,20 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     contextMenuClose();
   };
 
+  const handleFileClick = (item: FileOrFolder) => {
+    if ("filename" in item) {
+      setLines(item.content);
+    }
+  };
+
   const renderFileOrFolder = (item: FileOrFolder) => {
     if ("filename" in item) {
       // Item is a File
       return (
-        <li onContextMenu={(e) => handleContextMenu(e, item)}>
+        <li
+          onContextMenu={(e) => handleContextMenu(e, item)}
+          onClick={() => handleFileClick(item)}
+        >
           <FontAwesomeIcon
             icon={["fas", "file"]}
             className="file-navigator-icon"
