@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import Toolbar from "../../components/Toolbar/Toolbar";
@@ -17,6 +17,7 @@ import useWebSocket from "../../hooks/useWebSocket";
 
 const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
+  const activeFile = useRef<FileOrFolder | null>(null);
   const [command, setCommand] = useState<string>("");
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
@@ -105,6 +106,7 @@ const Editor = () => {
       value={{
         files,
         setFiles,
+        activeFile,
         command,
         setCommand,
         lines,

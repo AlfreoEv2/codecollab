@@ -4,6 +4,7 @@ import { FileOrFolder } from "../interfaces/SidebarInterface";
 interface IEditorContext {
   files: FileOrFolder[];
   setFiles: Dispatch<React.SetStateAction<FileOrFolder[]>>;
+  activeFile: React.MutableRefObject<FileOrFolder | null>;
   lines: string[];
   setLines: Dispatch<React.SetStateAction<string[]>>;
   handleLineChange: (e: React.FormEvent<HTMLDivElement>, index: number) => void;

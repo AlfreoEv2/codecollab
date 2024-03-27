@@ -20,21 +20,22 @@ export default function useWebSocket(
     ws.current = new WebSocket(url);
 
     ws.current.onopen = () => {
-      console.log("Connected to WebSocket server");
+      // console.log("Connected to WebSocket server");
       // Join the session
       ws.current?.send(JSON.stringify({ type: "join", session }));
     };
 
     ws.current.onclose = () => {
-      console.log("Disconnected from WebSocket server");
+      // console.log("Disconnected from WebSocket server");
     };
 
     ws.current.onmessage = (message) => {
+      console.log("Received message:", message.data);
       onMessage(JSON.parse(message.data));
     };
 
     ws.current.onerror = (error) => {
-      console.error("WebSocket error:", error);
+      // console.error("WebSocket error:", error);
     };
 
     return () => {

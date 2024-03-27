@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileOrFolder, Folder } from "../../interfaces/SidebarInterface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import { createFolder, deleteFolder, renameFolder } from "../../apis/folder";
 import CreateFilePopup from "../ContextMenu/CreateFilePopup";
@@ -21,7 +21,8 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
   const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
   const [showRenamePopup, setShowRenamePopup] = useState(false);
-  const { activeProject, setFiles, setLines } = useEditorContext();
+  const { activeProject, setFiles, lines, setLines, activeFile } =
+    useEditorContext();
   const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
   const { send } = useWebSocket("ws://localhost:8080", (data) => {
     if (data.type === "files" && data.files) {
@@ -310,6 +311,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const handleFileClick = (item: FileOrFolder) => {
     if ("filename" in item) {
       setLines(item.content);
+      activeFile.current = item;
     }
   };
 

@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import ContentEditable from "./ContentEditable";
 import useEditorContext from "../../hooks/useEditorContext";
 import "./CodeArea.css";
+import { FileOrFolder, Folder } from "../../interfaces/SidebarInterface";
+import useWebSocket from "../../hooks/useWebSocket";
 
 const CodeArea = () => {
   const {
@@ -14,7 +16,15 @@ const CodeArea = () => {
     handleArrowUp,
     handleArrowDown,
     handleTab,
+    activeFile,
+    setFiles,
   } = useEditorContext();
+
+  const { send } = useWebSocket("ws://localhost:8080", (data) => {
+    if (data.type === "files" && data.files) {
+      setFiles(data.files);
+    }
+  });
 
   // State to keep track of the start and end indices of the selection
   const [selection, setSelection] = useState<{
@@ -107,6 +117,41 @@ const CodeArea = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (activeFile.current) {
+      setFiles((prevFiles) => {
+        const newFiles = JSON.parse(JSON.stringify(prevFiles));
+
+        function findFileById(
+          array: Folder[],
+          itemId: string
+        ): FileOrFolder | null {
+          for (let i = 0; i < array.length; i++) {
+            const item = array[i];
+            if ("files" in item) {
+              const foundFile = item.files.find((file) => file._id === itemId);
+              if (foundFile) {
+                foundFile.content = lines;
+                return foundFile;
+              }
+            }
+            if (item.children && item.children.length > 0) {
+              const foundFile = findFileById(item.children, itemId);
+              if (foundFile) {
+                return foundFile;
+              }
+            }
+          }
+          return null;
+        }
+
+        if (activeFile.current) findFileById(newFiles, activeFile.current._id);
+        send({ type: "files", files: newFiles });
+        return newFiles;
+      });
+    }
+  }, [lines]);
 
   return (
     <div className="code-area">

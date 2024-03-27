@@ -33,7 +33,7 @@ export default function useLineHandlers(
       const newLines = [...prevLines];
       newLines[index] = e.currentTarget.innerHTML;
 
-      send({ type: "lines", lines: newLines });
+      // send({ type: "lines", lines: newLines });
 
       return newLines;
     });
