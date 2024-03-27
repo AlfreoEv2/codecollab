@@ -48,11 +48,13 @@ const Editor = () => {
         projectName,
         owner: "65ff34d5cc86ce3e8187c738", // Replace with the actual owner ID
         collaborators: [], // Add collaborators if needed
-        language: "javascript", // Replace with the desired language
+        language: "javascript",
       };
       const newProject = await createProject(projectData);
       setActiveProject(newProject._id);
       const projectDetails = await getProjectDetails(newProject._id);
+      setActiveProject(projectDetails._id);
+      console.log(projectDetails._id);
       setFiles([projectDetails.rootFolder]);
       setShowNewProjectPopup(false);
       send({ type: "files", files: [projectDetails.rootFolder] });
