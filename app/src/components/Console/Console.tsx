@@ -10,13 +10,12 @@ const Console = () => {
     <div className="console-container">
       <div className="console-header">Console</div>
       <div className="console-content"></div>
+      <div className="console-message">{message}</div>
       <ContentEditable
         html={command}
         onChange={(e) => setCommand(e.currentTarget.innerHTML)}
         className="console-input"
-        disabled={true}
       />
-      {message}
     </div>
   );
 };
