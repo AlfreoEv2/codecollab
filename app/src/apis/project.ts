@@ -11,7 +11,7 @@ interface CreateProjectData {
 export const createProject = async (projectData: CreateProjectData) => {
   try {
     const response = await axios.post(
-      "https://codecollab-m571.onrender.com/projects/",
+      "http://localhost:3000/projects/",
       projectData
     );
     return response.data;
@@ -24,7 +24,7 @@ export const createProject = async (projectData: CreateProjectData) => {
 export const getProjectDetails = async (projectId: string) => {
   try {
     const response = await axios.get(
-      `https://codecollab-m571.onrender.com/projects/${projectId}`
+      `http://localhost:3000/projects/${projectId}`
     );
     const project = response.data;
     console.log("Project:", JSON.stringify(project, null, 2));
