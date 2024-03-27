@@ -158,6 +158,11 @@ const CodeArea = () => {
                   case "Tab":
                     handleTab(e, index);
                     break;
+                  case "s":
+                    if (e.ctrlKey) {
+                      e.preventDefault();
+                    }
+                    break;
                   default:
                     break;
                 }
