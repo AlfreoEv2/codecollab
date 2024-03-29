@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileOrFolder, Folder } from "../../interfaces/SidebarInterface";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ContextMenu from "../ContextMenu/ContextMenu";
 import { createFolder, deleteFolder, renameFolder } from "../../apis/folder";
 import CreateFilePopup from "../ContextMenu/CreateFilePopup";
@@ -9,6 +9,7 @@ import { createFile, deleteFile, renameFile } from "../../apis/file";
 import CreateFolderPopup from "../ContextMenu/CreateFolderPopup";
 import RenamePopup from "../ContextMenu/RenamePopup";
 import useWebSocket from "../../hooks/useWebSocket";
+import { findFileById } from "../../utils/fileUtils";
 
 const initialContextMenu = {
   show: false,
@@ -21,7 +22,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const [showCreateFilePopup, setShowCreateFilePopup] = useState(false);
   const [showCreateFolderPopup, setShowCreateFolderPopup] = useState(false);
   const [showRenamePopup, setShowRenamePopup] = useState(false);
-  const { activeProject, setFiles, lines, setLines } = useEditorContext();
+  const { activeProject, setFiles, setLines, activeFile } = useEditorContext();
   const [selectedItem, setSelectedItem] = useState<FileOrFolder | null>(null);
   const { send } = useWebSocket("ws://localhost:8080", (data) => {
     if (data.type === "files" && data.files) {
@@ -239,34 +240,11 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           await renameFile(selectedItem._id, newName);
           setFiles((prevFiles) => {
             const newFiles = JSON.parse(JSON.stringify(prevFiles));
-
-            function findFileById(
-              array: Folder[],
-              itemId: string
-            ): FileOrFolder | null {
-              for (let i = 0; i < array.length; i++) {
-                const item = array[i];
-                if ("files" in item) {
-                  const foundFile = item.files.find(
-                    (file) => file._id === itemId
-                  );
-                  if (foundFile) {
-                    foundFile.filename = newName;
-                    return foundFile;
-                  }
-                }
-                if (item.children && item.children.length > 0) {
-                  const foundFile = findFileById(item.children, itemId);
-                  if (foundFile) {
-                    return foundFile;
-                  }
-                }
-              }
-              return null;
+            const foundFile = findFileById(newFiles, selectedItem._id);
+            if (foundFile) {
+              foundFile.filename = newName;
+              send({ type: "files", files: newFiles });
             }
-
-            findFileById(newFiles, selectedItem._id);
-            send({ type: "files", files: newFiles });
             return newFiles;
           });
         } else if ("folderName" in selectedItem) {
@@ -310,6 +288,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const handleFileClick = (item: FileOrFolder) => {
     if ("filename" in item) {
       setLines(item.content);
+      activeFile.current = item;
     }
   };
 
@@ -351,39 +330,6 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
       );
     }
   };
-
-  useEffect(() => {
-    if ("filename" in item) {
-      setFiles((prevFiles) => {
-        const newFiles = JSON.parse(JSON.stringify(prevFiles));
-        function findFileById(array: Folder[], itemId: string): FileOrFolder {
-          for (let i = 0; i < array.length; i++) {
-            const item = array[i];
-            if ("files" in item) {
-              const foundFile = item.files.find((file) => file._id === itemId);
-              if (foundFile) {
-                foundFile.content = lines;
-                send({ type: "files", files: newFiles });
-                return foundFile;
-              }
-            }
-            if (item.children && item.children.length > 0) {
-              const foundFile = findFileById(item.children, itemId);
-              if (foundFile) {
-                return foundFile;
-              }
-            }
-          }
-          return item;
-        }
-
-        findFileById(newFiles, item._id);
-        return newFiles;
-      });
-    } else {
-      console.log("Item is not a file, item:", item);
-    }
-  }, [lines]);
 
   return (
     <>
