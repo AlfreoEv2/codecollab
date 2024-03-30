@@ -43,46 +43,121 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     setContextMenu(initialContextMenu);
   };
 
+  const findFileFolderRemove = (array: Folder[], itemId: string): boolean => {
+    for (let i = 0; i < array.length; i++) {
+      const item = array[i];
+
+      if ("filename" in selectedItem) {
+        if ("files" in item) {
+          const fileIndex = item.files.findIndex((file) => file._id === itemId);
+          if (fileIndex !== -1) {
+            item.files.splice(fileIndex, 1);
+            return true;
+          }
+        }
+      } else if ("folderName" in selectedItem) {
+        if (item._id === itemId) {
+          item.files = [];
+          item.children = [];
+          array.splice(i, 1);
+          return true;
+        }
+      }
+
+      if (item.children && item.children.length > 0) {
+        const removed = findFileFolderRemove(item.children, itemId);
+        if (removed) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  const findFileFolderRename = (
+    array: Folder[],
+    itemId: string,
+    itemRename: any
+  ): FileOrFolder | null => {
+    for (let i = 0; i < array.length; i++) {
+      const item = array[i];
+      if ("filename" in itemRename) {
+        if ("files" in item) {
+          const foundFile = item.files.find((file) => file._id === itemId);
+          if (foundFile) {
+            foundFile.filename = itemRename.filename;
+            return foundFile;
+          }
+        }
+      } else if ("folderName" in itemRename) {
+        if (item._id === itemId) {
+          item.folderName = itemRename.folderName;
+          return item;
+        }
+      }
+      if (item.children && item.children.length > 0) {
+        const foundFile = findFileFolderRename(
+          item.children,
+          itemId,
+          itemRename
+        );
+        if (foundFile) {
+          return foundFile;
+        }
+      }
+    }
+    return null;
+  };
+
+  const findFileFolderCreate = (
+    array: Folder[],
+    itemId: string,
+    newItem: any
+  ): Folder | null => {
+    for (let i = 0; i < array.length; i++) {
+      const item = array[i];
+      if (item._id === itemId) {
+        if ("filename" in newItem) {
+          console.log("We in filename");
+          item.files.push({
+            _id: newItem._id,
+            filename: newItem.filename,
+            content: [""],
+          });
+        } else if ("folderName" in newItem) {
+          console.log("We got in foldername: " + newItem.folderName);
+          item.children.push({
+            _id: newItem._id,
+            folderName: newItem.folderName,
+            files: newItem.files,
+            children: newItem.children,
+          });
+        }
+        return item;
+      }
+      if (item.children && item.children.length > 0) {
+        const foundItem: Folder | null = findFileFolderCreate(
+          item.children,
+          itemId,
+          newItem
+        );
+        if (foundItem) {
+          return foundItem;
+        }
+      }
+    }
+    return null;
+  };
+
   const handleCreateFile = async (filename: string) => {
     if ("folderName" in item) {
       try {
         console.log("id: " + item._id + " id and" + activeProject);
-        const createFiled = await createFile(filename, item._id);
+        const createdFile = await createFile(filename, item._id);
         setShowCreateFilePopup(false);
         setFiles((prevFiles) => {
           const newFiles = JSON.parse(JSON.stringify(prevFiles));
-
-          function findFolderById(
-            array: Folder[],
-            itemId: string
-          ): Folder | null {
-            for (let i = 0; i < array.length; i++) {
-              const item = array[i];
-              if (item._id === itemId) {
-                console.log("Found it!");
-                console.log(item);
-                item.files.push({
-                  _id: createFiled._id,
-                  filename: filename,
-                  content: [""],
-                });
-                return item;
-              }
-              if (item.children && item.children.length > 0) {
-                const foundItem: Folder | null = findFolderById(
-                  item.children,
-                  itemId
-                );
-                if (foundItem) {
-                  return foundItem;
-                }
-              }
-            }
-            return null;
-          }
-
-          findFolderById(newFiles, item._id);
-
+          findFileFolderCreate(newFiles, item._id, createdFile);
           send({ type: "files", files: newFiles });
           return newFiles;
         });
@@ -96,7 +171,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
   const handleCreateFolder = async (folderName: string) => {
     if ("folderName" in item && activeProject !== null) {
       try {
-        const createFiled = await createFolder(
+        const createdFolder = await createFolder(
           folderName,
           activeProject,
           item._id
@@ -104,39 +179,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
         setShowCreateFolderPopup(false);
         setFiles((prevFiles) => {
           const newFiles = JSON.parse(JSON.stringify(prevFiles));
-
-          function findFolderById(
-            array: Folder[],
-            itemId: string
-          ): Folder | null {
-            for (let i = 0; i < array.length; i++) {
-              const item = array[i];
-              if (item._id === itemId) {
-                console.log("Found it!");
-                console.log(item);
-                item.children.push({
-                  _id: createFiled._id,
-                  folderName: folderName,
-                  files: createFiled.files,
-                  children: createFiled.children,
-                });
-                return item;
-              }
-              if (item.children && item.children.length > 0) {
-                const foundItem: Folder | null = findFolderById(
-                  item.children,
-                  itemId
-                );
-                if (foundItem) {
-                  return foundItem;
-                }
-              }
-            }
-            return null;
-          }
-
-          findFolderById(newFiles, item._id);
-
+          findFileFolderCreate(newFiles, item._id, createdFolder);
           send({ type: "files", files: newFiles });
           return newFiles;
         });
@@ -160,31 +203,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
           setFiles((prevFiles) => {
             const newFiles = JSON.parse(JSON.stringify(prevFiles));
 
-            function removeFileById(array: Folder[], itemId: string): boolean {
-              for (let i = 0; i < array.length; i++) {
-                const item = array[i];
-
-                if ("files" in item) {
-                  const fileIndex = item.files.findIndex(
-                    (file) => file._id === itemId
-                  );
-                  if (fileIndex !== -1) {
-                    item.files.splice(fileIndex, 1);
-                    return true;
-                  }
-                }
-
-                if (item.children && item.children.length > 0) {
-                  const removed = removeFileById(item.children, itemId);
-                  if (removed) {
-                    return true;
-                  }
-                }
-              }
-              return false;
-            }
-
-            removeFileById(newFiles, selectedItem._id);
+            findFileFolderRemove(newFiles, selectedItem._id);
             send({ type: "files", files: newFiles });
             return newFiles;
           });
@@ -194,32 +213,7 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
 
           setFiles((prevFiles) => {
             const newFiles = JSON.parse(JSON.stringify(prevFiles));
-
-            function removeFolderById(
-              array: Folder[],
-              itemId: string
-            ): boolean {
-              for (let i = 0; i < array.length; i++) {
-                const item = array[i];
-
-                if (item._id === itemId) {
-                  item.files = [];
-                  item.children = [];
-                  array.splice(i, 1);
-                  return true;
-                }
-
-                if (item.children && item.children.length > 0) {
-                  const removed = removeFolderById(item.children, itemId);
-                  if (removed) {
-                    return true;
-                  }
-                }
-              }
-              return false;
-            }
-
-            removeFolderById(newFiles, selectedItem._id);
+            findFileFolderRemove(newFiles, selectedItem._id);
             send({ type: "files", files: newFiles });
             return newFiles;
           });
@@ -236,65 +230,18 @@ const FileNavigatorItem = ({ item }: { item: FileOrFolder }) => {
     if (selectedItem) {
       try {
         if ("filename" in selectedItem) {
-          await renameFile(selectedItem._id, newName);
+          const renamedFile = await renameFile(selectedItem._id, newName);
           setFiles((prevFiles) => {
             const newFiles = JSON.parse(JSON.stringify(prevFiles));
-
-            function findFileById(
-              array: Folder[],
-              itemId: string
-            ): FileOrFolder | null {
-              for (let i = 0; i < array.length; i++) {
-                const item = array[i];
-                if ("files" in item) {
-                  const foundFile = item.files.find(
-                    (file) => file._id === itemId
-                  );
-                  if (foundFile) {
-                    foundFile.filename = newName;
-                    return foundFile;
-                  }
-                }
-                if (item.children && item.children.length > 0) {
-                  const foundFile = findFileById(item.children, itemId);
-                  if (foundFile) {
-                    return foundFile;
-                  }
-                }
-              }
-              return null;
-            }
-
-            findFileById(newFiles, selectedItem._id);
+            findFileFolderRename(newFiles, selectedItem._id, renamedFile);
             send({ type: "files", files: newFiles });
             return newFiles;
           });
         } else if ("folderName" in selectedItem) {
-          await renameFolder(selectedItem._id, newName);
+          const renamedFolder = await renameFolder(selectedItem._id, newName);
           setFiles((prevFiles) => {
             const newFiles = JSON.parse(JSON.stringify(prevFiles));
-
-            function findFolderById(
-              array: Folder[],
-              itemId: string
-            ): Folder | null {
-              for (let i = 0; i < array.length; i++) {
-                const item = array[i];
-                if (item._id === itemId) {
-                  item.folderName = newName;
-                  return item;
-                }
-                if (item.children && item.children.length > 0) {
-                  const foundFolder = findFolderById(item.children, itemId);
-                  if (foundFolder) {
-                    return foundFolder;
-                  }
-                }
-              }
-              return null;
-            }
-
-            findFolderById(newFiles, selectedItem._id);
+            findFileFolderRename(newFiles, selectedItem._id, renamedFolder);
             send({ type: "files", files: newFiles });
             return newFiles;
           });
