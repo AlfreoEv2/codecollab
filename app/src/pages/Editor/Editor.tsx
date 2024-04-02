@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import Toolbar from "../../components/Toolbar/Toolbar";
@@ -14,9 +14,11 @@ import NewProjectPopup from "../../components/ProjectPopup/NewProjectPopup";
 import { createProject, getProjectDetails } from "../../apis/project";
 import OpenProjectPopup from "../../components/ProjectPopup/OpenProjectPopup";
 import useWebSocket from "../../hooks/useWebSocket";
+import { findFileById } from "../../utils/fileUtils";
 
 const Editor = () => {
   const [files, setFiles] = useState<FileOrFolder[]>([]);
+  const activeFile = useRef<FileOrFolder | null>(null);
   const [command, setCommand] = useState<string>("");
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [showNewProjectPopup, setShowNewProjectPopup] = useState(false);
@@ -102,11 +104,27 @@ const Editor = () => {
     }
   }, []);
 
+  useEffect(() => {
+    setFiles((prevFiles) => {
+      if (activeFile.current && "filename" in activeFile.current) {
+        const newFiles = JSON.parse(JSON.stringify(prevFiles));
+        const foundFile = findFileById(newFiles, activeFile.current._id);
+        if (foundFile) {
+          foundFile.content = lines;
+          send({ type: "files", files: newFiles });
+          return newFiles;
+        }
+      }
+      return prevFiles;
+    });
+  }, [lines]);
+
   return (
     <EditorContext.Provider
       value={{
         files,
         setFiles,
+        activeFile,
         command,
         setCommand,
         lines,
