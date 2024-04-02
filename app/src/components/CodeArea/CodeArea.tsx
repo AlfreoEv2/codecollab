@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import ContentEditable from "./ContentEditable";
 import useEditorContext from "../../hooks/useEditorContext";
+import { updateFileContent } from "../../apis/file";
 import "./CodeArea.css";
 
 const CodeArea = () => {
@@ -14,6 +15,7 @@ const CodeArea = () => {
     handleArrowUp,
     handleArrowDown,
     handleTab,
+    activeFile,
   } = useEditorContext();
 
   // State to keep track of the start and end indices of the selection
@@ -161,6 +163,8 @@ const CodeArea = () => {
                   case "s":
                     if (e.ctrlKey) {
                       e.preventDefault();
+                      if (activeFile.current)
+                        updateFileContent(activeFile.current._id, lines);
                     }
                     break;
                   default:

@@ -104,4 +104,29 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
+// PATCH route to update file content
+router.patch("/:id/content", async (req, res) => {
+  try {
+    const fileId = req.params.id;
+    const { newContent } = req.body;
+
+    const updatedFile = await FileModel.findByIdAndUpdate(
+      fileId,
+      {
+        content: newContent,
+        lastModifiedDate: new Date(),
+      },
+      { new: true }
+    );
+
+    if (!updatedFile) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    res.json(updatedFile);
+  } catch (err: any) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default router;

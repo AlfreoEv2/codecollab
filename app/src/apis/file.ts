@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const createFile = async (filename: string, parentFolderId: string) => {
+const createFile = async (filename: string, parentFolderId: string) => {
   try {
     const response = await axios.post("http://localhost:3000/files/", {
       filename,
@@ -14,7 +14,7 @@ export const createFile = async (filename: string, parentFolderId: string) => {
   }
 };
 
-export const deleteFile = async (fileId: string) => {
+const deleteFile = async (fileId: string) => {
   try {
     console.log("We called the Delete API");
     await axios.delete(`http://localhost:3000/files/${fileId}`);
@@ -24,7 +24,7 @@ export const deleteFile = async (fileId: string) => {
   }
 };
 
-export const renameFile = async (fileId: string, newFilename: string) => {
+const renameFile = async (fileId: string, newFilename: string) => {
   try {
     const response = await axios.patch(
       `http://localhost:3000/files/${fileId}`,
@@ -38,3 +38,22 @@ export const renameFile = async (fileId: string, newFilename: string) => {
     throw error;
   }
 };
+
+const updateFileContent = async (fileId: string, newContent: string[]) => {
+  try {
+    const response = await axios.patch(
+      `http://localhost:3000/files/${fileId}/content`,
+      {
+        newContent,
+      }
+    );
+
+    console.log("Response from the server:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating file content:", error);
+    throw error;
+  }
+};
+
+export { createFile, deleteFile, renameFile, updateFileContent };
